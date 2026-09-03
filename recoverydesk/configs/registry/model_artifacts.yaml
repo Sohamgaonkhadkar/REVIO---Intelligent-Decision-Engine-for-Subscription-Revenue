@@ -1,0 +1,53 @@
+model_id: c5-xgboost-native-categorical
+model_family: xgboost_native_categorical
+model_version: 1.0.0
+training_domain: SIM
+calibration:
+  calibration_version: null
+  mode: uncalibrated
+  note: No calibration artifact exists in the bundle; probabilities are uncalibrated XGBoost outputs.
+    Never presented as calibrated.
+policy_allows_uncalibrated: true
+model_path: artifacts/models/c5/xgboost_native_categorical_c5.json  # mounted by compose (D-026/D-029)
+schema_path: artifacts/reports/c5_xgb_native_categorical/native_categorical_schema.json
+provenance:
+  note: Schema JSON is a transport serialization of the canonical native_categorical_schema.joblib (joblib
+    remains canonical outside this workspace). Re-verify hashes when the canonical joblib returns.
+  transport_provenance: uploaded by project owner 2026-08-26
+sha256:
+  model: 9434606cd1e443e3e2c4967eb29a5ea1a8dac83edbb127d7a1a43f0edd6196ba
+  schema: e4fd63c862e479349c16967449d11e6881c80629c1bb4dfbf278908444a722dc
+  best_params: 333757586ddea3a183683aeccc4f555cd7c41abe2e61a0ac0814cc0e00a7d3a7
+  metrics: f26987a4d823d49785fb5e8ccad76c80a3836097136467fda52845e623ef9a53
+  optuna_trials: 5b0bd92b9d2534954d7a22789cb47e3782fb142ae1e4f44fe4d4c8f552fa2155
+expected_counts:
+  features: 32
+  categorical: 12
+  numeric: 20
+training:
+  split: C4 case-grouped 110,385 / 23,471 / 23,567 (train/valid/test)
+  cv: 5-fold StratifiedGroupKFold by case_id
+  n_estimators: 1256
+  source: best_params.json + Phase 3C docs
+metrics:
+  source: artifacts/reports/c5_xgb_native_categorical/native_categorical_metrics.csv
+  label: TEST-on-synthetic-split (simulator domain) — NOT production performance
+  rows:
+  - model: xgboost_native_categorical
+    split: train
+    pr_auc: '0.9365115349479314'
+    roc_auc: '0.9783220657493'
+    log_loss: '0.18210991852366137'
+    brier: '0.052692152961798355'
+  - model: xgboost_native_categorical
+    split: validation
+    pr_auc: '0.8120935537074346'
+    roc_auc: '0.9354370332134035'
+    log_loss: '0.26437293788846233'
+    brier: '0.08248235299309876'
+  - model: xgboost_native_categorical
+    split: test
+    pr_auc: '0.831339781866431'
+    roc_auc: '0.9402055368807928'
+    log_loss: '0.25219064329356916'
+    brier: '0.07770182524366621'

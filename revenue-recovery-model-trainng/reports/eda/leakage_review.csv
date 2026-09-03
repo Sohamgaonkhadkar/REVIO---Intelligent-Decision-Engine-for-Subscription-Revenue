@@ -1,0 +1,46 @@
+column,classification,usable_for_ml,reason,source,eda_leakage_flag
+logging_policy,POLICY / LOGGING,False,"Describes the policy that generated/logged the observation. Retain for EDA and offline policy evaluation, not production prediction.",ml_datamart,CANDIDATE
+case_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart,DROP - IDENTIFIER
+subscription_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart,DROP - IDENTIFIER
+customer_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart,DROP - IDENTIFIER
+decision_seq,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+decision_ts_h,TEMPORAL SOURCE FIELD,False,Used to derive decision-time temporal features. Raw timestamp should not automatically enter X.,ml_datamart,CANDIDATE
+failure_class_at_decision,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+first_failure_class,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+rail,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+bank_name,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+segment,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+plan_tier,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+amount_inr,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+value_tier,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+retries_used_before,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+contacts_sent_before,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+hours_since_open,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+instrument_fixed,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+age_band,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+state,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+locale_pref,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+customer_tenure_days,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+subscription_age_days,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+sub_billing_day,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+prior_cycles_seen,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+prior_successes,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+prior_success_rate,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+prior_failed_cases_before,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+prior_recovered_cases_before,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+day_of_month,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+day_of_week,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+hour_of_day,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+in_salary_cluster,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+hours_to_next_cluster_slot,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+salary_day_proxy_dom,OBSERVABLE DECISION-TIME FEATURE,True,Observable case/customer/payment state available at or before the decision.,ml_datamart,CANDIDATE
+action_type,ACTION / INTERVENTION,True,Candidate intervention variable in the conditional propensity formulation.,ml_datamart,CANDIDATE
+channel,ACTION / INTERVENTION,True,Candidate intervention variable in the conditional propensity formulation.,ml_datamart,CANDIDATE
+exec_ts_h,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart,DROP - FUTURE/OUTCOME
+exec_delay_hours,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart,DROP - FUTURE/OUTCOME
+exec_hour_of_day,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart,DROP - FUTURE/OUTCOME
+exec_day_of_month,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart,DROP - FUTURE/OUTCOME
+exec_in_salary_cluster,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart,DROP - FUTURE/OUTCOME
+y,TARGET,False,Intervention outcome label. Never included in X.,ml_datamart,DROP - TARGET
+response_kind,OUTCOME / LABEL METADATA,False,Censoring/response metadata. Not a decision-time predictor.,ml_datamart,DROP - FUTURE/OUTCOME
+censored,OUTCOME / LABEL METADATA,False,Censoring/response metadata. Not a decision-time predictor.,ml_datamart,DROP - FUTURE/OUTCOME

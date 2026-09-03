@@ -1,0 +1,5 @@
+{
+  "excluded_leakage_columns": [
+    "response_kind"
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "customers.parquet": {
+    "file_size_bytes": 79889,
+    "row_count": 20000,
+    "schema": {
+      "customer_id": "int64",
+      "age_band": "object",
+      "state": "object",
+      "locale_pref": "object",
+      "signed_up_date": "object"
+    },
+    "key_cardinalities": {
+      "customer_id": 20000
+    },
+    "key_null_rates": {
+      "customer_id": 0.0
+    }
+  },
+  "subscriptions.parquet": {
+    "file_size_bytes": 147050,
+    "row_count": 22078,
+    "schema": {
+      "subscription_id": "int64",
+      "customer_id": "int64",
+      "segment": "object",
+      "plan_tier": "object",
+      "plan_amount_inr": "int64",
+      "cadence": "object",
+      "start_date": "object",
+      "billing_day_of_month": "int64",
+      "rail": "object",
+      "bank_name": "object",
+      "mandate_max_amount_inr": "int64",
+      "status": "object"
+    },
+    "key_cardinalities": {
+      "subscription_id": 22078,
+      "customer_id": 20000
+    },
+    "key_null_rates": {
+      "subscription_id": 0.0,
+      "customer_id": 0.0
+    }
+  },
+  "payment_attempts.parquet": {
+    "file_size_bytes": 609842,
+    "row_count": 264936,
+    "schema": {
+      "attempt_id": "int64",
+      "case_id": "int64",
+      "subscription_id": "int64",
+      "customer_id": "int64",
+      "ts_h": "int64",
+      "attempt_index": "int64",
+      "amount_inr": "int64",
+      "outcome": "object",
+      "failure_class": "object",
+      "is_recovery_attempt": "bool",
+      "ts_iso": "object"
+    },
+    "key_cardinalities": {
+      "attempt_id": 264936,
+      "case_id": 1,
+      "subscription_id": 22078,
+      "customer_id": 20000
+    },
+    "key_null_rates": {
+      "attempt_id": 0.0,
+      "case_id": 0.0,
+      "subscription_id": 0.0,
+      "customer_id": 0.0
+    }
+  },
+  "recovery_cases.parquet": {
+    "file_size_bytes": 980983,
+    "row_count": 103026,
+    "schema": {
+      "case_id": "int64",
+      "policy_id": "object",
+      "subscription_id": "int64",
+      "customer_id": "int64",
+      "opened_ts_h": "int64",
+      "closed_ts_h": "int64",
+      "first_failure_class": "object",
+      "current_failure_class": "object",
+      "amount_at_risk_inr": "int64",
+      "value_tier": "object",
+      "n_decisions": "int64",
+      "retries_used": "int64",
+      "contacts_sent": "int64",
+      "cost_total_inr": "float64",
+      "fatigue_total": "float64",
+      "resolution": "object",
+      "recovered_flag": "bool",
+      "recovered_amount_inr": "float64",
+      "time_to_recovery_h": "float64"
+    },
+    "key_cardinalities": {
+      "case_id": 26798,
+      "policy_id": 4,
+      "subscription_id": 11596,
+      "customer_id": 10924
+    },
+    "key_null_rates": {
+      "case_id": 0.0,
+      "policy_id": 0.0,
+      "subscription_id": 0.0,
+      "customer_id": 0.0
+    }
+  },
+  "recovery_events.parquet": {
+    "file_size_bytes": 4726076,
+    "row_count": 986365,
+    "schema": {
+      "event_id": "int64",
+      "policy_id": "object",
+      "case_id": "int64",
+      "subscription_id": "int64",
+      "customer_id": "int64",
+      "ts_h": "int64",
+      "event_type": "object",
+      "detail_json": "object",
+      "ts_iso": "object"
+    },
+    "key_cardinalities": {
+      "event_id": 380458,
+      "policy_id": 4,
+      "case_id": 26798,
+      "subscription_id": 11596,
+      "customer_id": 10924
+    },
+    "key_null_rates": {
+      "event_id": 0.0,
+      "policy_id": 0.0,
+      "case_id": 0.0,
+      "subscription_id": 0.0,
+      "customer_id": 0.0
+    }
+  },
+  "action_log.parquet": {
+    "file_size_bytes": 1398717,
+    "row_count": 157423,
+    "schema": {
+      "action_id": "int64",
+      "policy_id": "object",
+      "case_id": "int64",
+      "decision_seq": "int64",
+      "decision_ts_h": "int64",
+      "action_type": "object",
+      "channel": "object",
+      "exec_ts_h": "int64",
+      "exec_delay_hours": "int64",
+      "failure_class_at_decision": "object",
+      "first_failure_class": "object",
+      "rail": "object",
+      "value_tier": "object",
+      "retries_used_before": "int64",
+      "contacts_sent_before": "int64",
+      "hours_since_open": "int64",
+      "instrument_fixed": "bool",
+      "escalated": "bool",
+      "label_success": "bool",
+      "response_kind": "object"
+    },
+    "key_cardinalities": {
+      "action_id": 64926,
+      "policy_id": 3,
+      "case_id": 25775,
+      "decision_seq": 16
+    },
+    "key_null_rates": {
+      "action_id": 0.0,
+      "policy_id": 0.0,
+      "case_id": 0.0,
+      "decision_seq": 0.0
+    }
+  }
+}

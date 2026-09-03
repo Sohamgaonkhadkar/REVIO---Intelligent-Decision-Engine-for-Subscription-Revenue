@@ -1,0 +1,2 @@
+feature,q1,q3,iqr,lower_review_bound,upper_review_bound,below_bound_count,above_bound_count
+amount_inr,299.0,999.0,700.0,-751.0,2049.0,0,19445

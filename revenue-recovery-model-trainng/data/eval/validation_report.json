@@ -1,0 +1,178 @@
+{
+  "sim_version": "0.3.0",
+  "seed": 20260823,
+  "timestamp_utc": "2026-08-23T13:19:14.276037+00:00",
+  "all_passed": true,
+  "results": [
+    {
+      "check": "1.customer_id_unique",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "2.subscription_id_unique",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "3.attempt_id_unique",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "4.subscriptions_reference_customers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "5.attempts_reference_subscriptions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "6.cases_reference_subscriptions_and_customers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "7.events_reference_cases",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "8a.exactly_one_close_per_case",
+      "passed": true,
+      "detail": "cases=103026 closes=103026"
+    },
+    {
+      "check": "8b.no_events_after_close",
+      "passed": true,
+      "detail": "violations=0"
+    },
+    {
+      "check": "8c.resolutions_valid",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "9.no_actions_after_terminal",
+      "passed": true,
+      "detail": "violations=0"
+    },
+    {
+      "check": "10a.retry_budget_respected(<=3, NPCI 1+3)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "10b.retried_attempts_match",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "10c.contact_budget_respected(<=2)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "11a.recovered_le_at_risk",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "11b.at_most_one_success_event_per_case",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "11c.recovered_implies_success_event",
+      "passed": true,
+      "detail": "missing=0"
+    },
+    {
+      "check": "11d.case_id_unique_per_policy",
+      "passed": true,
+      "detail": "dupes=0"
+    },
+    {
+      "check": "12.timestamps_monotone_per_case",
+      "passed": true,
+      "detail": "bad=0"
+    },
+    {
+      "check": "13.required_columns_customers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_subscriptions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_payment_attempts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_recovery_cases",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_recovery_events",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_action_log",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "13.required_columns_ml_datamart",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "14a.amounts_in_range",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "14b.failure_classes_in_taxonomy",
+      "passed": true,
+      "detail": "['BANK_TECHNICAL', 'CARD_EXPIRED', 'CARD_LOST_STOLEN', 'INSUFFICIENT_FUNDS', 'MANDATE_CLOSED', 'MANDATE_PAUSED']"
+    },
+    {
+      "check": "14c.hours_within_sim",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "14d.cases_within_horizon+72h_tail",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "15.mart_leakage_and_range_guards",
+      "passed": true,
+      "detail": "decision<=exec;no latent/feature-of-truth cols;y binary;nonnegative history"
+    },
+    {
+      "check": "16a.upi_first_failure_band[0.05,0.18]",
+      "passed": true,
+      "detail": "upi=0.113"
+    },
+    {
+      "check": "16b.card_first_failure_band[0.01,0.08]",
+      "passed": true,
+      "detail": "card=0.073"
+    },
+    {
+      "check": "16c.failure_mix_diverse(>=4 classes)",
+      "passed": true,
+      "detail": "INSUFFICIENT_FUNDS:13270, BANK_TECHNICAL:5127, MANDATE_PAUSED:3968, MANDATE_CLOSED:3647, CARD_EXPIRED:452, CARD_LOST_STOLEN:334"
+    }
+  ]
+}

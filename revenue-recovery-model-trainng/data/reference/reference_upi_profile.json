@@ -1,0 +1,126 @@
+{
+  "dataset": "UPI Transactions 2024 (Kaggle skullagos5246, CC0, SYNTHETIC source)",
+  "rows": 250000,
+  "dup_txn_ids": 0,
+  "nulls": {
+    "transaction id": 0,
+    "timestamp": 0,
+    "transaction type": 0,
+    "merchant_category": 0,
+    "amount (INR)": 0,
+    "transaction_status": 0,
+    "sender_age_group": 0,
+    "receiver_age_group": 0,
+    "sender_state": 0,
+    "sender_bank": 0,
+    "receiver_bank": 0,
+    "device_type": 0,
+    "network_type": 0,
+    "fraud_flag": 0,
+    "hour_of_day": 0,
+    "day_of_week": 0,
+    "is_weekend": 0
+  },
+  "bank_share": {
+    "SBI": 0.2508,
+    "HDFC": 0.1499,
+    "ICICI": 0.1191,
+    "IndusInd": 0.1007,
+    "Axis": 0.1002,
+    "PNB": 0.0998,
+    "Yes Bank": 0.0994,
+    "Kotak": 0.0801
+  },
+  "state_share": {
+    "Maharashtra": 0.1497,
+    "Uttar Pradesh": 0.1205,
+    "Karnataka": 0.119,
+    "Tamil Nadu": 0.1015,
+    "Delhi": 0.0995,
+    "Telangana": 0.0897,
+    "Gujarat": 0.0802,
+    "Andhra Pradesh": 0.08,
+    "Rajasthan": 0.0799,
+    "West Bengal": 0.0799
+  },
+  "age_share": {
+    "26-35": 0.3497,
+    "36-45": 0.2515,
+    "18-25": 0.2494,
+    "46-55": 0.0994,
+    "56+": 0.05
+  },
+  "txn_type": {
+    "P2P": 0.4498,
+    "P2M": 0.3506,
+    "Bill Payment": 0.1495,
+    "Recharge": 0.0501
+  },
+  "status_rate_NOT_ADOPTED_no_failure_reasons": {
+    "SUCCESS": 0.9505,
+    "FAILED": 0.0495
+  },
+  "fraud_rate_NOT_ADOPTED": 0.00192,
+  "amount_by_category": {
+    "Fuel": {
+      "p05": 348.0,
+      "p50": 1037.0,
+      "p95": 4096.0,
+      "n": 25063
+    },
+    "Education": {
+      "p05": 770.0,
+      "p50": 3670.0,
+      "p95": 14172.0,
+      "n": 7598
+    },
+    "Food": {
+      "p05": 63.0,
+      "p50": 332.0,
+      "p95": 1690.0,
+      "n": 37464
+    },
+    "Healthcare": {
+      "p05": 137.0,
+      "p50": 384.0,
+      "p95": 1496.0,
+      "n": 12663
+    },
+    "Utilities": {
+      "p05": 202.0,
+      "p50": 1864.0,
+      "p95": 6520.0,
+      "n": 22338
+    },
+    "Other": {
+      "p05": 167.0,
+      "p50": 615.0,
+      "p95": 2303.0,
+      "n": 24828
+    },
+    "Entertainment": {
+      "p05": 115.0,
+      "p50": 294.0,
+      "p95": 1116.0,
+      "n": 20103
+    },
+    "Grocery": {
+      "p05": 157.0,
+      "p50": 821.0,
+      "p95": 3230.0,
+      "n": 49966
+    },
+    "Transport": {
+      "p05": 39.0,
+      "p50": 189.0,
+      "p95": 921.0,
+      "n": 20105
+    },
+    "Shopping": {
+      "p05": 235.0,
+      "p50": 1564.0,
+      "p95": 7825.0,
+      "n": 29872
+    }
+  }
+}

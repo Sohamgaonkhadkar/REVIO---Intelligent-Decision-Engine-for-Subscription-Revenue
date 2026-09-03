@@ -1,0 +1,76 @@
+# costs.yaml — EV-layer economics. ALL values resolve from the assumption
+# registry (configs/registry/assumption_registry.yaml); the config-lint test
+# fails the build if a constant here lacks a registry entry (PHASE_4 §11.3).
+# Hard-coded policy numbers in code are a build error.
+
+version: 1
+currency: INR
+
+action_cost_inr:
+  RETRY_AT_WINDOW: 1.0          # PSP fee prior, Phase 3A §7 band ₹0–2
+  SEND_PAYMENT_LINK: 0.5        # Phase 3A §7 band ₹0.1–1
+  REQUEST_PM_UPDATE: 1.0        # Phase 3A §7
+  ESCALATE_TO_HUMAN: 50.0       # human-time proxy, Phase 3A §7 (₹50+)
+  SEND_REMINDER:                # per channel, Phase 3A §7 band ₹0.1–1
+    email: 0.1
+    sms: 0.5
+    whatsapp: 0.5
+  WAIT_UNTIL: 0.0
+  STOP_CASE: 0.0
+
+channel_cost_inr:               # applied in addition to action cost
+  email: 0.0
+  sms: 0.0
+  whatsapp: 0.0
+
+# Friction ledger (Phase 3A §7 fatigue_delta cells)
+fatigue_delta:
+  RETRY_AT_WINDOW: 0
+  SEND_REMINDER: 1
+  SEND_PAYMENT_LINK: 1
+  REQUEST_PM_UPDATE: 2
+  WAIT_UNTIL: 0
+  STOP_CASE: 0
+  ESCALATE_TO_HUMAN: 0
+
+# Fatigue cost curve: ₹ penalty for the NEXT contact given contacts already sent
+fatigue_cost_curve_inr:
+  0: 0.0
+  1: 5.0
+  2: 25.0
+
+value:
+  margin_factor: 0.75           # recoverable_value = amount_at_risk × margin_factor
+
+# Opportunity cost of consuming a scarce retry (D-018), by value tier
+retry_budget_shadow_price_inr:
+  low: 5.0
+  mid: 15.0
+  high: 40.0
+
+# STOP rule: stop when best feasible EV ≤ threshold (by tier)
+stop_threshold_inr:
+  low: 0.0
+  mid: 0.0
+  high: -25.0
+
+# Escalation triggers (evaluated after EV argmax; ESCALATE freezes auto-actions)
+escalation_policy:
+  high:
+    escalate_when:
+      - max_ev_le_threshold
+      - mandate_dead
+      - failed_attempts_gte: 2
+  mid:
+    escalate_when:
+      - mandate_dead
+  low:
+    escalate_when: []
+
+tiers:
+  low:  { max_amount_inr: 300 }
+  mid:  { min_amount_inr: 300, max_amount_inr: 1000 }
+  high: { min_amount_inr: 1000 }
+
+notification_response_window_hours: 24   # label window Δ (Phase 2 §6 M1)
+awaiting_window_hours: 36                # AWAITING_CUSTOMER dwell before re-decide

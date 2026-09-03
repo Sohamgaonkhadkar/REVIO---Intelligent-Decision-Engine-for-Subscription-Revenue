@@ -1,0 +1,239 @@
+version: 3
+source_artifact: artifacts/reports/c5_xgb_native_categorical/native_categorical_schema.json
+source_artifact_sha256: e4fd63c862e479349c16967449d11e6881c80629c1bb4dfbf278908444a722dc
+note: Generated mechanically by scripts/gen_feature_contract.py from the shipped artifact schema (D-019).
+  The 43/17/26 documented contract was a planned extension this artifact does not register; do NOT hand-edit.
+runtime_to_artifact_vocab:
+  rail:
+    upi_autopay: UPI_AUTOPAY
+    card_si: CARD_SI
+  value_tier:
+    low: LOW
+    mid: MID
+    high: HIGH
+  action_type:
+    RETRY_AT_WINDOW: RETRY
+    SEND_REMINDER: SEND_REMINDER
+    SEND_PAYMENT_LINK: SEND_PAYMENT_LINK
+    REQUEST_PM_UPDATE: REQUEST_PM_UPDATE
+  channel:
+    email: EMAIL
+    sms: SMS
+    whatsapp: WHATSAPP
+  channel_for_non_contact_actions: __UNKNOWN__
+target:
+  name: y
+  availability: TARGET
+excluded:
+  identifiers:
+  - customer_id
+  - subscription_id
+  - case_id
+  - action_id
+  - attempt_id
+  - event_id
+  policy:
+  - logging_policy
+  post_decision:
+  - exec_ts_h
+  - exec_in_salary_cluster
+  - exec_day_of_month
+  - exec_hour_of_day
+  - exec_delay_hours
+  - response_kind
+  - censored
+  outcome_derived:
+  - recovered_flag
+  - recovered_amount_inr
+  - resolution_type
+  - time_to_recovery_h
+  - close_ts
+  latent:
+  - true_salary_day
+  - intent_archetype
+  - latent_balance
+  - latent_reliability
+  - latent_responsiveness
+  - future_outage
+  counterfactual:
+  - cf_*
+features:
+- name: amount_inr
+  dtype: numeric
+  null_policy: zero_default
+- name: customer_tenure_days
+  dtype: numeric
+  null_policy: zero_default
+- name: subscription_age_days
+  dtype: numeric
+  null_policy: zero_default
+- name: prior_cycles_seen
+  dtype: numeric
+  null_policy: zero_default
+- name: prior_successes
+  dtype: numeric
+  null_policy: zero_default
+- name: prior_success_rate
+  dtype: numeric
+  null_policy: zero_default
+- name: prior_failed_cases_before
+  dtype: numeric
+  null_policy: zero_default
+- name: prior_recovered_cases_before
+  dtype: numeric
+  null_policy: zero_default
+- name: retries_used_before
+  dtype: numeric
+  null_policy: zero_default
+- name: contacts_sent_before
+  dtype: numeric
+  null_policy: zero_default
+- name: hours_since_open
+  dtype: numeric
+  null_policy: zero_default
+- name: decision_seq
+  dtype: numeric
+  null_policy: zero_default
+- name: hour_of_day
+  dtype: numeric
+  null_policy: zero_default
+- name: day_of_month
+  dtype: numeric
+  null_policy: zero_default
+- name: hours_to_next_cluster_slot
+  dtype: numeric
+  null_policy: zero_default
+- name: salary_day_proxy_dom
+  dtype: numeric
+  null_policy: zero_default
+- name: rail
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - UPI_AUTOPAY
+  - CARD_SI
+  - __UNKNOWN__
+- name: bank_name
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - PNB
+  - INDUSIND
+  - HDFC
+  - YES_BANK
+  - SBI
+  - KOTAK
+  - AXIS
+  - ICICI
+  - __UNKNOWN__
+- name: segment
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - OTT_STREAMING
+  - EDUCATION
+  - FITNESS
+  - SAAS_SMB
+  - NEWS_MEDIA
+  - __UNKNOWN__
+- name: plan_tier
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - PREMIUM
+  - STANDARD
+  - BASIC
+  - __UNKNOWN__
+- name: value_tier
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - MID
+  - LOW
+  - HIGH
+  - __UNKNOWN__
+- name: first_failure_class
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - INSUFFICIENT_FUNDS
+  - BANK_TECHNICAL
+  - MANDATE_PAUSED
+  - MANDATE_CLOSED
+  - CARD_LOST_STOLEN
+  - CARD_EXPIRED
+  - __UNKNOWN__
+- name: failure_class_at_decision
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - INSUFFICIENT_FUNDS
+  - RATE_LIMIT
+  - BANK_TECHNICAL
+  - MANDATE_PAUSED
+  - MANDATE_CLOSED
+  - CARD_LOST_STOLEN
+  - CARD_EXPIRED
+  - __UNKNOWN__
+- name: instrument_fixed
+  dtype: numeric
+  null_policy: zero_default
+- name: age_band
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - AGE_26_35
+  - AGE_18_25
+  - AGE_36_45
+  - AGE_46_55
+  - AGE_56_PLUS
+  - __UNKNOWN__
+- name: state
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - RAJASTHAN
+  - DELHI
+  - MAHARASHTRA
+  - TAMIL_NADU
+  - TELANGANA
+  - GUJARAT
+  - ANDHRA_PRADESH
+  - WEST_BENGAL
+  - KARNATAKA
+  - UTTAR_PRADESH
+  - __UNKNOWN__
+- name: locale_pref
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - HI_EN
+  - EN
+  - HI
+  - __UNKNOWN__
+- name: day_of_week
+  dtype: numeric
+  null_policy: zero_default
+- name: in_salary_cluster
+  dtype: numeric
+  null_policy: zero_default
+- name: amount_inr_log1p
+  dtype: numeric
+  null_policy: zero_default
+- name: action_type
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - RETRY
+  - SEND_PAYMENT_LINK
+  - SEND_REMINDER
+  - REQUEST_PM_UPDATE
+  - __UNKNOWN__
+- name: channel
+  dtype: categorical
+  null_policy: unknown_category
+  vocab:
+  - SMS
+  - WHATSAPP
+  - EMAIL
+  - __UNKNOWN__

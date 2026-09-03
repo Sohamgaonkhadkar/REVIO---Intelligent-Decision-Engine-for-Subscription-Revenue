@@ -1,0 +1,9 @@
+table,column,null_count,non_numeric_count,min_value,max_value
+recovery_cases,opened_ts_h,0,0,6,8574
+recovery_cases,closed_ts_h,0,0,6,8954
+action_log,decision_ts_h,0,0,6,8836
+action_log,exec_ts_h,0,0,8,8837
+case_outcomes,opened_ts_h,0,0,6,8574
+case_outcomes,closed_ts_h,0,0,6,8954
+ml_datamart,decision_ts_h,0,0,6,8836
+ml_datamart,exec_ts_h,0,0,8,8837

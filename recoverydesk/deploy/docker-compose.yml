@@ -1,0 +1,78 @@
+# RecoveryDesk — authoritative deployment topology (PHASE_4 §23.1, Architecture A).
+#   db   : PostgreSQL 16 + pgvector (single source of truth; SKIP LOCKED queue,
+#          append-only zones enforced by db/roles.sql grants)
+#   api  : FastAPI core role (orchestrator + scorer + gateway in-process)
+#   ops  : same image, ops role (aggregates · monitors · exports)
+#   web  : nginx serving the built SPA, proxying /api to the api service
+#
+#   docker compose --env-file deploy/envs/dev.env up --build
+
+name: recoverydesk
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: rd_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in env file}
+      POSTGRES_DB: recoverydesk
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rd_owner -d recoverydesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: >
+      sh -c "python -m db.bootstrap &&
+             uvicorn apps.api.main:app --host 0.0.0.0 --port 8000"
+    environment: &api_env
+      DATABASE_URL: postgresql+psycopg://rd_owner:${POSTGRES_PASSWORD}@db:5432/recoverydesk
+      APP_ENV: ${APP_ENV:-sim}
+      RUNTIME_ROLE: core
+      COPILOT_ENABLED: "false"
+    volumes:
+      - ../artifacts/reports:/app/artifacts/reports:ro
+      - ${RD_MODEL_JSON:-/home/user/uploads/xgboost_native_categorical_c5.json}:/app/artifacts/models/c5/xgboost_native_categorical_c5.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  ops:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: sh -c "python -m db.bootstrap && python -m apps.workers.loop"
+    environment:
+      <<: *api_env
+      RUNTIME_ROLE: ops
+    volumes:
+      - ../artifacts/reports:/app/artifacts/reports:ro
+      - ${RD_MODEL_JSON:-/home/user/uploads/xgboost_native_categorical_c5.json}:/app/artifacts/models/c5/xgboost_native_categorical_c5.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  web:
+    image: nginx:1.27-alpine
+    volumes:
+      - ../apps/web/spa:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

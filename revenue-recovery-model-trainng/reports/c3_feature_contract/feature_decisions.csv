@@ -1,0 +1,38 @@
+feature,decision,reason
+subscription_id,IDENTIFIER,Retained for audit/grouped split; excluded from X.
+case_id,IDENTIFIER,Retained for audit/grouped split; excluded from X.
+customer_id,IDENTIFIER,Retained for audit/grouped split; excluded from X.
+amount_inr,STATE_FEATURE,C0-approved observable decision-time candidate.
+customer_tenure_days,STATE_FEATURE,C0-approved observable decision-time candidate.
+subscription_age_days,STATE_FEATURE,C0-approved observable decision-time candidate.
+prior_cycles_seen,STATE_FEATURE,C0-approved observable decision-time candidate.
+prior_successes,STATE_FEATURE,C0-approved observable decision-time candidate.
+prior_success_rate,STATE_FEATURE,C0-approved observable decision-time candidate.
+prior_failed_cases_before,STATE_FEATURE,C0-approved observable decision-time candidate.
+prior_recovered_cases_before,STATE_FEATURE,C0-approved observable decision-time candidate.
+retries_used_before,STATE_FEATURE,C0-approved observable decision-time candidate.
+contacts_sent_before,STATE_FEATURE,C0-approved observable decision-time candidate.
+hours_since_open,STATE_FEATURE,C0-approved observable decision-time candidate.
+decision_seq,STATE_FEATURE,C0-approved observable decision-time candidate.
+hour_of_day,STATE_FEATURE,C0-approved observable decision-time candidate.
+day_of_month,STATE_FEATURE,C0-approved observable decision-time candidate.
+hours_to_next_cluster_slot,STATE_FEATURE,C0-approved observable decision-time candidate.
+salary_day_proxy_dom,ENGINEERED_STATE,Deterministic decision-time feature.
+rail,STATE_FEATURE,C0-approved observable decision-time candidate.
+bank_name,STATE_FEATURE,C0-approved observable decision-time candidate.
+segment,STATE_FEATURE,C0-approved observable decision-time candidate.
+plan_tier,STATE_FEATURE,C0-approved observable decision-time candidate.
+value_tier,STATE_FEATURE,C0-approved observable decision-time candidate.
+first_failure_class,STATE_FEATURE,C0-approved observable decision-time candidate.
+failure_class_at_decision,STATE_FEATURE,C0-approved observable decision-time candidate.
+instrument_fixed,STATE_FEATURE,C0-approved observable decision-time candidate.
+age_band,STATE_FEATURE,C0-approved observable decision-time candidate.
+state,STATE_FEATURE,C0-approved observable decision-time candidate.
+locale_pref,STATE_FEATURE,C0-approved observable decision-time candidate.
+day_of_week,STATE_FEATURE,C0-approved observable decision-time candidate.
+in_salary_cluster,STATE_FEATURE,C0-approved observable decision-time candidate.
+amount_inr_log1p,ENGINEERED_STATE,Deterministic decision-time feature.
+action_type,INTERVENTION,Candidate action variable; separate from state X.
+channel,INTERVENTION,Candidate action variable; separate from state X.
+logging_policy,POLICY / LOGGING,Retained for policy diagnostics; excluded from X.
+y,TARGET,Supervised label.

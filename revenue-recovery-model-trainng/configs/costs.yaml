@@ -1,0 +1,63 @@
+# Intervention costs and customer-friction parameters. ALL ASSUMED (no public ground truth);
+# they exist to make the decision layer cost/friction-aware. Units: INR and fatigue points.
+
+retry_cost_inr: 0.50            # PSP/infra cost proxy per attempt (UPI TDR is 0%; infra nonzero)
+reminder_cost_inr: {EMAIL: 0.05, SMS: 0.25, WHATSAPP: 0.40}
+link_cost_inr: {EMAIL: 0.05, SMS: 0.25, WHATSAPP: 0.40}
+pm_update_cost_inr: {EMAIL: 0.10, SMS: 0.50, WHATSAPP: 0.80}
+escalation_cost_inr: 50.0       # human-review time proxy
+
+fatigue_delta:                  # customer friction ledger (per contact)
+  RETRY: 0.0
+  SEND_REMINDER: 1.0
+  SEND_PAYMENT_LINK: 1.0
+  REQUEST_PM_UPDATE: 2.0
+
+channel_mult:                   # notification response multiplier by channel (ASSUMED)
+  EMAIL: 0.70
+  SMS: 1.00
+  WHATSAPP: 1.15
+
+response_mean_hours: 8.0        # ASSUMED: mean notification response latency
+response_window_hours: 24       # label window for contact actions (DECISION; sensitivity-tested later)
+fatigue_decay: 0.80             # response hazard multiplier per prior contact in the case (ASSUMED)
+recency_boost_hours: 72         # first-72h response boost window (ASSUMED)
+recency_boost_mult: 1.20        # ASSUMED
+
+value_tiers:                    # DECISION (demo thresholds)
+  low_max: 500
+  mid_max: 2000
+
+# --- latent sufficiency process (ASSUMED, calibrated to reference anchors) ---
+# p(sufficient) = clamp(base + rel_mult*reliability + timing_terms, ...)
+# timing: +post_salary_boost on salary day +0..4; -pre_salary_penalty on the 3 days before.
+sufficiency:
+  base_upi: 0.90
+  rel_mult_upi: 0.12
+  base_card: 0.992
+  rel_mult_card: 0.008
+  post_salary_boost: 0.15
+  pre_salary_penalty: 0.20
+  amount_log_penalty: 0.05      # p *= 1 - penalty*log2(amount/ref); milder than v0.2
+  amount_ref: 300.0
+  clamp_lo: 0.01
+  clamp_hi: 0.995
+
+# Card lifecycle (ASSUMED): network tokenization / account-updater silently refreshes
+# most expired cards; only the residual surfaces as a CARD_EXPIRED failure.
+card_silent_refresh_prob: 0.97
+
+# Bank outage process (ASSUMED, calibrated so technical declines ~1.5-2% of attempts)
+outage:
+  lambda_per_day: 0.10
+  duration_mean_h: 1.5
+  duration_min_h: 0.5
+  duration_max_h: 6.0
+
+renewal_jitter_p: 0.01        # residual issuer noise on first attempts (ASSUMED)
+retry_jitter_p: 0.012         # residual noise on retry attempts (ASSUMED)
+
+# User-initiated mandate lifecycle hazards per month (ASSUMED, after calibration)
+mandate_lifecycle:
+  p_pause:  {COMMITTED: 0.003, PASSIVE: 0.008, CHURN_LEANING: 0.030}
+  p_revoke: {COMMITTED: 0.0008, PASSIVE: 0.003, CHURN_LEANING: 0.010}

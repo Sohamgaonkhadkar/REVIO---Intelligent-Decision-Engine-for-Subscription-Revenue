@@ -1,0 +1,49 @@
+=== FRONTEND AUDIT ===
+
+[Hardcoded Rupee (Frontend)]
+apps/web/src\pages\Knowledge.tsx:117 -> <span className="chip info">cap ₹15,000</span>
+
+[Mock Array]
+
+[Hardcoded Percentage]
+apps/web/src\App.tsx:9 -> <linearGradient id="brandBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+apps/web/src\App.tsx:10 -> <stop offset="0%" stopColor="#7DD3FC" />
+apps/web/src\App.tsx:11 -> <stop offset="100%" stopColor="#2563EB" />
+apps/web/src\App.tsx:13 -> <filter id="brandGlow" x="-20%" y="-20%" width="140%" height="140%">
+apps/web/src\pages\CaseDetail.tsx:207 -> <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--bg-1)' }}>
+apps/web/src\pages\CaseDetail.tsx:257 -> <div style={{ width: 16, height: 16, borderRadius: '50%', background: color, border: '3px solid var(--bg-0)', marginTop: 2, boxShadow: glow }} />
+apps/web/src\pages\Outcomes.tsx:94 -> <div style={{ width: `${(base?.baselines?.B0?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
+apps/web/src\pages\Outcomes.tsx:102 -> <div style={{ width: `${(base?.baselines?.B1?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
+apps/web/src\pages\Outcomes.tsx:110 -> <div style={{ width: `${(base?.baselines?.B2?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
+apps/web/src\pages\Outcomes.tsx:118 -> <div style={{ width: `${(p_rec / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--good)', borderRadius: 99, boxShadow: '0 0 12px rgba(46, 139, 112, 0.4)', transition: 'width 1s ease' }} />
+... and 10 more.
+
+[SIMULATED Marker]
+apps/web/src\App.tsx:93 -> <span style={{ color: 'var(--money)' }}>●</span> SIM
+apps/web/src\App.tsx:101 -> <span style={{ color: 'var(--money)' }}>●</span> SIM · SIMULATED EVIDENCE
+
+[Hardcoded Case IDs]
+
+=== BACKEND AUDIT ===
+
+[Hardcoded Rupee (Frontend)]
+core\constraints\engine.py:173 -> f"amount ₹{snap.amount_at_risk:,.0f} exceeds ₹15,000 e-mandate cap "
+
+[Mock Array]
+
+[Hardcoded Percentage]
+
+[SIMULATED Marker]
+core\clock.py:1 -> """ClockPort — WallClock for SBX/PRD, SimClock for the SIM zone (D-024).
+core\domain\enums.py:21 -> SIM = "sim"
+core\domain\enums.py:302 -> BATCH_TICK = "BATCH_TICK"  # sim-zone batch advance (SIM env only)
+core\evaluation\baselines.py:160 -> "Phase-2 §14 baseline specs. Evaluation estimate inside the SIM — "
+core\gateway\gateway.py:228 -> # SIM world: does the customer respond inside the window? (keyed, after the
+core\orchestrator\loop.py:67 -> """wake_at is SIM time; due_at is REAL time (scheduler compares real now())."""
+core\orchestrator\seed.py:118 -> reason_code=f"SIM_{fclass}", clock=clock,
+core\scoring\gate.py:12 -> 8. training-domain metadata (training_domain == "SIM", disclosed per policy)
+core\scoring\gate.py:80 -> # 8: training domain must be recorded and disclosed as SIM
+core\scoring\gate.py:83 -> "training_domain_recorded", td == "SIM", f"training_domain={td!r}"))
+... and 2 more.
+
+[Hardcoded Case IDs]

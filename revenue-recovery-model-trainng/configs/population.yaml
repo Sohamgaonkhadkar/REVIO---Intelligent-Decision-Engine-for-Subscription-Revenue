@@ -1,0 +1,95 @@
+history_window_signup_start: '2022-01-01'
+history_window_signup_end: '2023-12-31'
+segment_weights:
+  OTT_STREAMING: 0.35
+  NEWS_MEDIA: 0.2
+  SAAS_SMB: 0.15
+  FITNESS: 0.15
+  EDUCATION: 0.15
+age_band_weights:
+  AGE_18_25: 0.2494
+  AGE_26_35: 0.3497
+  AGE_36_45: 0.2515
+  AGE_46_55: 0.0994
+  AGE_56_PLUS: 0.05
+state_weights:
+  MAHARASHTRA: 0.1498
+  UTTAR_PRADESH: 0.1205
+  KARNATAKA: 0.119
+  TAMIL_NADU: 0.1015
+  DELHI: 0.0995
+  TELANGANA: 0.0897
+  GUJARAT: 0.0802
+  ANDHRA_PRADESH: 0.08
+  RAJASTHAN: 0.0799
+  WEST_BENGAL: 0.0799
+locale_weights:
+  EN: 0.55
+  HI: 0.25
+  HI_EN: 0.2
+rail_weights:
+  UPI_AUTOPAY: 0.7
+  CARD_SI: 0.3
+multi_subscription_rate: 0.1
+bank_weights:
+  SBI: 0.2508
+  HDFC: 0.1499
+  ICICI: 0.1191
+  INDUSIND: 0.1007
+  AXIS: 0.1002
+  PNB: 0.0998
+  YES_BANK: 0.0994
+  KOTAK: 0.0801
+plan_prices_inr:
+  OTT_STREAMING:
+    BASIC: 149
+    STANDARD: 299
+    PREMIUM: 649
+  NEWS_MEDIA:
+    BASIC: 49
+    STANDARD: 99
+    PREMIUM: 299
+  SAAS_SMB:
+    BASIC: 499
+    STANDARD: 1499
+    PREMIUM: 3999
+  FITNESS:
+    BASIC: 299
+    STANDARD: 599
+    PREMIUM: 999
+  EDUCATION:
+    BASIC: 399
+    STANDARD: 899
+    PREMIUM: 2499
+tier_weights:
+  BASIC: 0.55
+  STANDARD: 0.3
+  PREMIUM: 0.15
+intent_weights:
+  COMMITTED: 0.55
+  PASSIVE: 0.3
+  CHURN_LEANING: 0.15
+reliability_prior_by_intent:
+  COMMITTED: 0.72
+  PASSIVE: 0.5
+  CHURN_LEANING: 0.28
+responsiveness_prior_by_intent:
+  COMMITTED: 0.55
+  PASSIVE: 0.35
+  CHURN_LEANING: 0.15
+trait_noise_std: 0.08
+salary_windows:
+  late_month_days:
+  - 28
+  - 29
+  - 30
+  early_month_days:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  late_month_weight: 0.35
+  early_month_weight: 0.45

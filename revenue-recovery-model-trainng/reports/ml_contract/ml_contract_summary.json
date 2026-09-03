@@ -1,0 +1,38 @@
+{
+  "project_objective": "P(success | observable decision-time state, candidate action, candidate timing)",
+  "target_column": "y",
+  "target_dtype": "int64",
+  "target_values": [
+    "0",
+    "1"
+  ],
+  "target_class_counts": {
+    "0": 121510,
+    "1": 35913
+  },
+  "target_class_proportions": {
+    "0": 0.7718694218760918,
+    "1": 0.2281305781239082
+  },
+  "grain": {
+    "total_rows": 157423,
+    "unique_cases": 25775,
+    "unique_customers": 10924,
+    "unique_subscriptions": 11596,
+    "unique_logging_policies": 3,
+    "avg_rows_per_case": 6.107584869059166
+  },
+  "candidate_feature_count": 32,
+  "excluded_column_count": 18,
+  "unknown_column_count": 0,
+  "normalization_rules": {
+    "numeric_types": "Standardize integer/float representation. Do not scale before EDA.",
+    "booleans": "Normalize boolean-like fields consistently.",
+    "categoricals": "Normalize whitespace/casing and inspect cardinality. Do not merge rare categories before EDA.",
+    "timestamps": "Parse timestamp/source fields consistently and derive temporal features. Do not use raw timestamps automatically as model features.",
+    "monetary_units": "Confirm amount fields are INR and use a consistent numeric representation.",
+    "missing_values": "Retain missingness for EDA. Decide on imputation only after analysing missingness.",
+    "outliers": "Do not remove or clip observations before EDA unless a structural validation proves they are invalid.",
+    "identifiers": "Preserve IDs for joins/grouped splits but exclude them from model X."
+  }
+}

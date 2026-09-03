@@ -1,0 +1,16 @@
+{
+  "seed": 20260824,
+  "strategy": "GroupShuffleSplit by case_id",
+  "requested_fractions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "rows": {
+    "train": 110385,
+    "validation": 23471,
+    "test": 23567
+  },
+  "preprocessing_fit_on": "train only",
+  "temporal_holdout_primary": false
+}

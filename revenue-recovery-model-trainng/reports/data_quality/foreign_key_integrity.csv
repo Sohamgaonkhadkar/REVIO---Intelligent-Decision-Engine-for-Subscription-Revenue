@@ -1,0 +1,7 @@
+parent,parent_key,child,child_key,status,child_rows,orphan_rows,orphan_rate
+customers,customer_id,subscriptions,customer_id,VALIDATED,22078,0,0.0
+subscriptions,subscription_id,payment_attempts,subscription_id,VALIDATED,264936,0,0.0
+recovery_cases,policy_id+case_id,recovery_events,policy_id+case_id,VALIDATED,986365,0,0.0
+recovery_cases,policy_id+case_id,action_log,policy_id+case_id,VALIDATED,157423,0,0.0
+recovery_cases,policy_id+case_id,case_outcomes,policy_id+case_id,VALIDATED,103026,0,0.0
+recovery_cases,policy_id+case_id,ml_datamart,logging_policy+case_id,VALIDATED,157423,0,0.0

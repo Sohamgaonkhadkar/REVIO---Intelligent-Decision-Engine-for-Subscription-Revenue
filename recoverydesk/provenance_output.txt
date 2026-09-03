@@ -1,0 +1,29 @@
+=== DB PROVENANCE ===
+
+=== SELECT 5 CASES FROM RECOVERY_CASES ===
+DB Case: ID=sim:upi_autopay:53187027a0ef, Amount=299.00, State=RECOVERED
+DB Case: ID=sim:upi_autopay:6d29ea6a599c, Amount=3999.00, State=RECOVERED
+DB Case: ID=sim:upi_autopay:b076fdd8b44b, Amount=999.00, State=RECOVERED
+DB Case: ID=sim:card_si:eb7fb23e8745, Amount=9999.00, State=STOPPED
+DB Case: ID=sim:upi_autopay:ecaefe55e6c7, Amount=299.00, State=STOPPED
+
+=== API CASES PROVENANCE ===
+API /api/cases Status: 200
+API Case: ID=sim:card_si:e091ea4e7036, Amount=1499.0, State=STOPPED
+API Case: ID=sim:upi_autopay:585d7091240f, Amount=1499.0, State=ESCALATED
+API Case: ID=sim:upi_autopay:5a4670248e4d, Amount=299.0, State=RECOVERED
+API Case: ID=sim:card_si:9746c1afc4a8, Amount=999.0, State=STOPPED
+API Case: ID=sim:card_si:9f98a6182c79, Amount=9999.0, State=ESCALATED
+
+=== DB TOTALS ===
+DB Total Cases: 120, DB Total At Risk: 210080.00
+
+=== API DASHBOARD TOTALS ===
+API /api/baselines Status: 200
+API Total Cases: 120, API Total At Risk: 210080.0
+API baselines keys: ['B0', 'B1', 'B2']
+
+=== CASE DETAIL PROVENANCE ===
+Testing Case Detail for ID sim:upi_autopay:53187027a0ef
+API Case Detail: None
+Error: Expecting value: line 1 column 1 (char 0)

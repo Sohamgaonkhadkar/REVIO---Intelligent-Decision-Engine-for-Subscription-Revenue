@@ -1,0 +1,8 @@
+{
+  "target_column": "y",
+  "ml_rows": 157423,
+  "unique_cases": 25775,
+  "unique_customers": 10924,
+  "candidate_feature_count": 32,
+  "insight_count": 5
+}

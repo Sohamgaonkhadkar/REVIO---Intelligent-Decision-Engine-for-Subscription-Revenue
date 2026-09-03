@@ -1,0 +1,176 @@
+[
+  {
+    "table": "customers",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "customers",
+    "column": "signed_up_date",
+    "change": "standardize_datetime_representation"
+  },
+  {
+    "table": "subscriptions",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "subscriptions",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "subscriptions",
+    "column": "start_date",
+    "change": "standardize_datetime_representation"
+  },
+  {
+    "table": "payment_attempts",
+    "column": "attempt_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "payment_attempts",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "payment_attempts",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "payment_attempts",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "payment_attempts",
+    "column": "ts_iso",
+    "change": "standardize_datetime_representation"
+  },
+  {
+    "table": "recovery_cases",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_cases",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_cases",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_events",
+    "column": "event_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_events",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_events",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_events",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "recovery_events",
+    "column": "ts_iso",
+    "change": "standardize_datetime_representation"
+  },
+  {
+    "table": "action_log",
+    "column": "action_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "action_log",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "case_outcomes",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "case_outcomes",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "case_outcomes",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "ml_datamart",
+    "column": "case_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "ml_datamart",
+    "column": "subscription_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  },
+  {
+    "table": "ml_datamart",
+    "column": "customer_id",
+    "change": "cast_to_string",
+    "from_dtype": "int64",
+    "to_dtype": "string"
+  }
+]

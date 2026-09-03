@@ -1,0 +1,6 @@
+constraint,violations,status
+recovery_cases.retries_used <= 3,0,PASS
+recovery_cases.contacts_sent <= 2,0,PASS
+case_outcomes.retries_used <= 3,0,PASS
+case_outcomes.contacts_sent <= 2,0,PASS
+ml_datamart.y is binary 0/1,0,PASS

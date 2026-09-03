@@ -1,0 +1,139 @@
+table,column,current_dtype,proposed_dtype,action,reason
+customers,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+customers,age_band,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+customers,state,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+customers,locale_pref,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+customers,signed_up_date,object,datetime64[ns],Parse as datetime,Calendar/date-time field; normalize representation.
+subscriptions,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+subscriptions,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+subscriptions,segment,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+subscriptions,plan_tier,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+subscriptions,plan_amount_inr,int64,int64,None,No representational change required.
+subscriptions,cadence,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+subscriptions,start_date,object,datetime64[ns],Parse as datetime,Calendar/date-time field; normalize representation.
+subscriptions,billing_day_of_month,int64,int64,None,No representational change required.
+subscriptions,rail,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+subscriptions,bank_name,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+subscriptions,mandate_max_amount_inr,int64,int64,None,No representational change required.
+subscriptions,status,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+payment_attempts,attempt_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+payment_attempts,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+payment_attempts,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+payment_attempts,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+payment_attempts,ts_h,int64,int64,None,No representational change required.
+payment_attempts,attempt_index,int64,int64,None,No representational change required.
+payment_attempts,amount_inr,int64,int64,None,No representational change required.
+payment_attempts,outcome,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+payment_attempts,failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+payment_attempts,is_recovery_attempt,bool,bool,None,No representational change required.
+payment_attempts,ts_iso,object,string,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_cases,policy_id,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_cases,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_cases,opened_ts_h,int64,int64,None,No representational change required.
+recovery_cases,closed_ts_h,int64,int64,None,No representational change required.
+recovery_cases,first_failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,current_failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,amount_at_risk_inr,int64,int64,None,No representational change required.
+recovery_cases,value_tier,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,n_decisions,int64,int64,None,No representational change required.
+recovery_cases,retries_used,int64,int64,None,No representational change required.
+recovery_cases,contacts_sent,int64,int64,None,No representational change required.
+recovery_cases,cost_total_inr,float64,float64,None,No representational change required.
+recovery_cases,fatigue_total,float64,float64,None,No representational change required.
+recovery_cases,resolution,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_cases,recovered_flag,bool,Int8,Normalize to nullable 0/1,Binary state/metadata field.
+recovery_cases,recovered_amount_inr,float64,float64,None,No representational change required.
+recovery_cases,time_to_recovery_h,float64,float64,None,No representational change required.
+recovery_events,event_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_events,policy_id,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_events,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_events,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_events,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+recovery_events,ts_h,int64,int64,None,No representational change required.
+recovery_events,event_type,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_events,detail_json,object,string,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+recovery_events,ts_iso,object,string,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,action_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+action_log,policy_id,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+action_log,decision_seq,int64,int64,None,No representational change required.
+action_log,decision_ts_h,int64,int64,None,No representational change required.
+action_log,action_type,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,channel,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,exec_ts_h,int64,int64,None,No representational change required.
+action_log,exec_delay_hours,int64,int64,None,No representational change required.
+action_log,failure_class_at_decision,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,first_failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,rail,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,value_tier,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+action_log,retries_used_before,int64,int64,None,No representational change required.
+action_log,contacts_sent_before,int64,int64,None,No representational change required.
+action_log,hours_since_open,int64,int64,None,No representational change required.
+action_log,instrument_fixed,bool,bool,None,No representational change required.
+action_log,escalated,bool,bool,None,No representational change required.
+action_log,label_success,bool,bool,None,No representational change required.
+action_log,response_kind,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+case_outcomes,policy_id,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+case_outcomes,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+case_outcomes,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+case_outcomes,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+case_outcomes,opened_ts_h,int64,int64,None,No representational change required.
+case_outcomes,closed_ts_h,int64,int64,None,No representational change required.
+case_outcomes,resolution,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+case_outcomes,recovered_flag,bool,Int8,Normalize to nullable 0/1,Binary state/metadata field.
+case_outcomes,recovered_amount_inr,float64,float64,None,No representational change required.
+case_outcomes,amount_at_risk_inr,int64,int64,None,No representational change required.
+case_outcomes,retries_used,int64,int64,None,No representational change required.
+case_outcomes,contacts_sent,int64,int64,None,No representational change required.
+case_outcomes,cost_total_inr,float64,float64,None,No representational change required.
+case_outcomes,fatigue_total,float64,float64,None,No representational change required.
+case_outcomes,time_to_recovery_h,float64,float64,None,No representational change required.
+case_outcomes,first_failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+case_outcomes,recovery_rate,float64,float64,None,No representational change required.
+ml_datamart,logging_policy,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,case_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+ml_datamart,subscription_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+ml_datamart,customer_id,int64,string,Cast to string,Identifier; preserve exact identity and avoid numeric interpretation.
+ml_datamart,decision_seq,int64,int64,None,No representational change required.
+ml_datamart,decision_ts_h,int64,int64,None,No representational change required.
+ml_datamart,failure_class_at_decision,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,first_failure_class,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,rail,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,bank_name,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,segment,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,plan_tier,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,amount_inr,int64,int64,None,No representational change required.
+ml_datamart,value_tier,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,retries_used_before,int64,int64,None,No representational change required.
+ml_datamart,contacts_sent_before,int64,int64,None,No representational change required.
+ml_datamart,hours_since_open,int64,int64,None,No representational change required.
+ml_datamart,instrument_fixed,bool,bool,None,No representational change required.
+ml_datamart,age_band,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,state,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,locale_pref,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,customer_tenure_days,int64,int64,None,No representational change required.
+ml_datamart,subscription_age_days,int64,int64,None,No representational change required.
+ml_datamart,sub_billing_day,int64,int64,None,No representational change required.
+ml_datamart,prior_cycles_seen,int64,int64,None,No representational change required.
+ml_datamart,prior_successes,int64,int64,None,No representational change required.
+ml_datamart,prior_success_rate,float64,float64,None,No representational change required.
+ml_datamart,prior_failed_cases_before,int64,int64,None,No representational change required.
+ml_datamart,prior_recovered_cases_before,int64,int64,None,No representational change required.
+ml_datamart,day_of_month,int64,int64,None,No representational change required.
+ml_datamart,day_of_week,int64,int64,None,No representational change required.
+ml_datamart,hour_of_day,int64,int64,None,No representational change required.
+ml_datamart,in_salary_cluster,bool,bool,None,No representational change required.
+ml_datamart,hours_to_next_cluster_slot,int64,int64,None,No representational change required.
+ml_datamart,salary_day_proxy_dom,int64,int64,None,No representational change required.
+ml_datamart,action_type,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,channel,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,exec_ts_h,int64,int64,None,No representational change required.
+ml_datamart,exec_delay_hours,int64,int64,None,No representational change required.
+ml_datamart,exec_hour_of_day,int64,int64,None,No representational change required.
+ml_datamart,exec_day_of_month,int64,int64,None,No representational change required.
+ml_datamart,exec_in_salary_cluster,bool,bool,None,No representational change required.
+ml_datamart,y,int64,int64,None,No representational change required.
+ml_datamart,response_kind,object,category,Review categorical dtype,Text/categorical field. Confirm category semantics during C2 before final casting.
+ml_datamart,censored,bool,Int8,Normalize to nullable 0/1,Binary state/metadata field.

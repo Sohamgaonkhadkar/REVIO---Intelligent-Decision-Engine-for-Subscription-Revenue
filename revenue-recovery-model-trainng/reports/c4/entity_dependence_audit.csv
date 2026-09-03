@@ -1,0 +1,4 @@
+entity,unique_entities,entities_with_multiple_decisions,max_rows_per_entity,mean_rows_per_entity
+case_id,25775,25513,13,6.107584869059166
+customer_id,10924,10924,109,14.410746979128524
+subscription_id,11596,11596,79,13.57562952742325

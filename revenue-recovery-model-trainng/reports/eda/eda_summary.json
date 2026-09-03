@@ -1,0 +1,9 @@
+{
+  "total_ml_rows": 157423,
+  "unique_cases": 25775,
+  "unique_customers": 10924,
+  "target_column": "y",
+  "target_missing": 0,
+  "target_positive_rate": 0.2281305781239082,
+  "candidate_feature_count": 32
+}

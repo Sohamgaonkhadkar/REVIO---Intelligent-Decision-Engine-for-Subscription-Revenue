@@ -1,0 +1,230 @@
+version: 1
+scenario_multipliers:
+  pessimistic: 0.8
+  base: 1.0
+  optimistic: 1.2
+  adversarial: 1.5
+entries:
+  retry_budget_per_cycle:
+    value: 3
+    unit: attempts
+    tag: FACT
+    source: NPCI recurring payments guidance; cited in PHASE_1 §19, PHASE_3A §6/§7
+    rationale: Strictly limited retry budget per cycle (1+3); enforced as attempt_index ≤ 4.
+  contact_cap_per_case:
+    value: 2
+    unit: contacts
+    tag: DECISION
+    source: PHASE_3A §7 (≤2 per case); master prompt §4
+    rationale: Contact budget per recovery case to bound fatigue.
+  contact_cooldown_hours:
+    value: 20
+    unit: hours
+    tag: DECISION
+    source: PHASE_3A §7; PHASE_4 §6.2 counters-as-guards
+    rationale: Minimum spacing between contacts on the same case.
+  quiet_hours:
+    value: 21:00-08:00
+    unit: IST clock range
+    tag: FACT_REFERENCED
+    source: Master prompt §4 example; PHASE_4 §7.1 windows family
+    rationale: No execution/notification inside quiet hours; snap to next legal window.
+  legal_debit_window:
+    value: 08:00-21:00
+    unit: IST clock range
+    tag: ASSUMED
+    source: Developer-set within NPCI non-peak-window doctrine (PHASE_4 §7.1)
+    rationale: Daily legal execution window for mandate debits, both rails in V1.
+  contact_hours:
+    value: 09:00-21:00
+    unit: IST clock range
+    tag: ASSUMED
+    source: Developer-set (PHASE_3A §7 quiet-hours cell)
+    rationale: Customer-contact eligibility window; stricter start than debit window.
+  window_bins:
+    value:
+    - W08_11
+    - W11_14
+    - W14_17
+    - W17_21
+    tag: DECISION
+    source: D-010 (recoverysim config not delivered; bins author-chosen)
+    rationale: Four legal execution bins per day; NPCI-window-aligned, config-owned.
+  amount_cap_inr:
+    value: 15000
+    unit: INR
+    tag: FACT
+    source: RBI e-mandate framework; cited in PHASE_1 §19, PHASE_3A §3/§6
+    rationale: ₹15,000 general e-mandate cap; above requires AFA (out of V1 scope).
+  case_horizon_hours:
+    value: 336
+    unit: hours
+    tag: DECISION
+    source: PHASE_3A §12 (default 14d); DATASET_BUILD_REPORT (336h horizon)
+    rationale: Case window = failure → cycle end + grace; expiry closes as window_expired.
+  cost_retry_inr:
+    value: 1.0
+    tag: ASSUMED
+    source: PHASE_3A §7 cost cell (band ₹0–2, PSP fee priors)
+    rationale: Mid-band retry execution cost.
+  cost_reminder_email_inr:
+    value: 0.1
+    tag: ASSUMED
+    source: PHASE_3A §7 band ₹0.1–1
+    rationale: Low-band email cost.
+  cost_reminder_sms_inr:
+    value: 0.5
+    tag: ASSUMED
+    source: PHASE_3A §7 band ₹0.1–1
+    rationale: Mid-band SMS cost.
+  cost_reminder_whatsapp_inr:
+    value: 0.5
+    tag: ASSUMED
+    source: PHASE_3A §7 band ₹0.1–1
+    rationale: Mid-band WhatsApp cost.
+  cost_payment_link_inr:
+    value: 0.5
+    tag: ASSUMED
+    source: PHASE_3A §7 band ₹0.1–1
+    rationale: Link issuance cost.
+  cost_pm_update_inr:
+    value: 1.0
+    tag: ASSUMED
+    source: PHASE_3A §7 (₹1)
+    rationale: PM-update flow cost.
+  cost_escalation_inr:
+    value: 50.0
+    tag: ASSUMED
+    source: PHASE_3A §7 (₹50+ human-time proxy)
+    rationale: Tier-gated escalation cost.
+  margin_factor:
+    value: 0.75
+    tag: ASSUMED
+    source: Developer-set merchant config (PHASE_4 §11.1 margin_factor(merchant config))
+    rationale: Fraction of amount_at_risk counted as recoverable value.
+  fatigue_cost_curve_inr:
+    value:
+      0: 0.0
+      1: 5.0
+      2: 25.0
+    tag: ASSUMED
+    source: Developer-set (PHASE_4 §11.1 fatigue_cost registry curve)
+    rationale: Escalating ₹ penalty per additional contact; bounds contact spam.
+  retry_budget_shadow_price_inr:
+    value:
+      low: 5.0
+      mid: 15.0
+      high: 40.0
+    tag: DECISION
+    source: D-018 (operationalization of attempt_opportunity_cost)
+    rationale: Scarce-retry opportunity cost by value tier; deterministic stand-in.
+  stop_threshold_inr:
+    value:
+      low: 0.0
+      mid: 0.0
+      high: -25.0
+    tag: DECISION
+    source: Developer-set (PHASE_4 §11.1 stop_threshold(value_tier))
+    rationale: Best-EV floor before STOP; high tier tolerates slightly negative EV.
+  value_tier_bounds_inr:
+    value:
+      low_max: 300
+      mid_max: 1000
+    tag: DECISION
+    source: Developer-set; informed by UPI category price points (ENT p50 ₹299, EDU max ₹3,999) in DATASET_BUILD_REPORT
+    rationale: low <₹300 ≤ mid <₹1000 ≤ high.
+  notification_response_window_hours:
+    value: 24
+    tag: DECISION
+    source: Phase 2 §6 M1 (Δ=24h, sensitivity-tested); PHASE_3B §11
+    rationale: Label/response window for contact actions.
+  awaiting_window_hours:
+    value: 36
+    tag: ASSUMED
+    source: Developer-set (AWAITING_CUSTOMER dwell before re-decide)
+    rationale: Response window granted to the customer before re-planning.
+  sim_bank_outage_rate_per_day:
+    value: 0.1
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 2 (Poisson 0.10/day)
+    rationale: Per-bank outage arrival prior.
+  sim_bank_outage_mean_hours:
+    value: 1.5
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 2 (~1.5h mean)
+    rationale: Outage duration prior.
+  sim_card_silent_refresh_rate:
+    value: 0.97
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 2 (97% silent refresh)
+    rationale: Tokenized card renewal probability.
+  sim_card_lost_stolen_rate:
+    value: 0.004
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 2 (0.4%)
+    rationale: Lost/stolen incidence.
+  sim_first_fail_upi:
+    value: 0.113
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §5 (UPI 11.3%)
+    rationale: Calibration anchor band for the reimplemented world.
+  sim_first_fail_card:
+    value: 0.073
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §5 (card 7.3%)
+    rationale: Calibration anchor band.
+  sim_anchor_recovery_b1:
+    value: 0.353
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §5 (B1 35.3%)
+    rationale: Plausibility band, NOT a target.
+  sim_anchor_recovery_b2:
+    value: 0.492
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §5 (B2 49.2%)
+    rationale: Plausibility band, NOT a target.
+  upi_bank_share_sbi:
+    value: 0.251
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 0 (SBI 25.1%)
+    rationale: Population prior from measured reference profile.
+  upi_bank_share_hdfc:
+    value: 0.15
+    tag: DATA_DERIVED
+    source: DATASET_BUILD_REPORT §3 Step 0 (HDFC 15.0%)
+    rationale: Population prior from measured reference profile.
+  upi_bank_share_others:
+    value:
+      ICICI: 0.12
+      AXIS: 0.1
+      KOTAK: 0.08
+      PNB: 0.06
+      BOB: 0.06
+      true: 0.05
+      IDFCFIRST: 0.05
+      INDUSIND: 0.04
+    tag: ASSUMED
+    source: Developer-set (remainder after documented SBI/HDFC shares; profile file not delivered)
+    rationale: Remaining major-bank weights normalized to the residual share.
+  rail_mix_upi:
+    value: 0.7
+    tag: DATA_DERIVED
+    source: PHASE_3A §14 (70/30 rail mix); DATASET_BUILD_REPORT §3 Step 2
+    rationale: Population rail split.
+  model_benchmark_source:
+    value: Phase_3C_Model_Training.md §11 (confirmed benchmark table)
+    tag: FACT
+    source: Phase 3C §11 native-categorical XGBoost results
+    rationale: TEST-on-synthetic-split metrics; never production performance.
+  doctrine_fallback_p_hat:
+    value:
+      retry_by_class:
+        BANK_TECHNICAL: 0.883
+        INSUFFICIENT_FUNDS: 0.162
+        RATE_LIMIT: 0.39
+      default_contact: 0.228
+    tag: DATA_DERIVED
+    source: 'DATASET_BUILD_REPORT §5 label-signal sanity (RETRY success: BANK_TECHNICAL 88.3% vs INSUFFICIENT_FUNDS
+      16.2% vs RATE_LIMIT 39%); mart positive rate 22.8%'
+    rationale: Deterministic fallback priors when the ML artifact cannot activate — honest, documented,
+      never presented as model output.

@@ -1,0 +1,21 @@
+# Technical knobs (NOT behavioral assumptions — those live in population.yaml / costs.yaml /
+# policies.yaml / registry/assumption_registry.yaml).
+simulation:
+  seed: 20260823
+  simulation_version: "0.3.0"        # dataset V1 build
+  timezone: "Asia/Kolkata"
+  sim_start: "2024-01-01"            # simulation calendar start (IST)
+  sim_days: 360                      # 12 x 30-day months (documented simplification)
+  renewal_hour: 5                    # renewals execute 05:00 IST (non-peak mandate window)
+  legal_exec_hours: [0, 1, 2, 3, 4, 5, 6]   # NPCI-style non-peak execution window
+  contact_hours: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  # quiet 21:00-08:00 (ASSUMED)
+  case_horizon_hours: 336            # 14 days; then case expires (ASSUMED)
+
+scale:
+  n_customers: 20000
+
+paths:
+  data_root: data
+  reference_dir: data/reference
+  generated_dir: data/generated
+  eval_dir: data/eval

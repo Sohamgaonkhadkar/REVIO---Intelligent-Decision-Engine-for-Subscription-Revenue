@@ -1,0 +1,9 @@
+{
+  "target_distribution": {},
+  "action_distribution": {
+    "RETRY": 101514,
+    "SEND_PAYMENT_LINK": 30884,
+    "SEND_REMINDER": 22649,
+    "REQUEST_PM_UPDATE": 2376
+  }
+}

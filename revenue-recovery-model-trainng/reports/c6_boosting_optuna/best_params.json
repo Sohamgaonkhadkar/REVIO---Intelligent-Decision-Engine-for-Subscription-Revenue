@@ -1,0 +1,32 @@
+{
+  "optimization_metric": "pr_auc",
+  "xgboost": {
+    "cv_pr_auc": 0.8116208421379696,
+    "params": {
+      "n_estimators": 700,
+      "max_depth": 10,
+      "learning_rate": 0.024617492728114143,
+      "min_child_weight": 5,
+      "subsample": 0.9153836546390688,
+      "colsample_bytree": 0.6005271117222348,
+      "gamma": 1.9066945859315654,
+      "reg_alpha": 0.18245960726062282,
+      "reg_lambda": 15.40593583205483
+    }
+  },
+  "lightgbm": {
+    "cv_pr_auc": 0.8111857818505366,
+    "params": {
+      "n_estimators": 400,
+      "learning_rate": 0.046973806524249075,
+      "num_leaves": 58,
+      "max_depth": 11,
+      "min_child_samples": 20,
+      "subsample": 0.9029048456156107,
+      "colsample_bytree": 0.6546843096714505,
+      "reg_alpha": 0.11909652183621279,
+      "reg_lambda": 3.728448749761798
+    }
+  },
+  "selection_rule": "Primary: CV PR-AUC and validation PR-AUC. Secondary: ROC-AUC, Log Loss, Brier. Test is final report only."
+}

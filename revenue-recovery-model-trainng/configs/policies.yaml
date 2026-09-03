@@ -1,0 +1,27 @@
+# Baseline policy definitions (logging policies for Dataset V1).
+# Sources: B1 mirrors documented PSP mechanics (Cashfree UPI 1+3 hourly; Razorpay daily->halt).
+# B2 encodes published dunning doctrine (Finsi/Slicker vendor tables; see assumption registry).
+
+B0_NONE:
+  description: "No recovery intervention; case expires at horizon."
+
+B1_PSP_PROXY:
+  description: "PSP-default proxy: fixed-cadence retries; single link on hard failures."
+  upi_retry_delay_hours: 1        # Cashfree: UPI AutoPay charges retry at hourly intervals
+  card_retry_delay_hours: 24      # Razorpay: next charge time updated by a single day
+  hard_failure_action: SEND_PAYMENT_LINK
+
+B2_DOCTRINE:
+  description: "Static best-practice doctrine (hand-written; NOT learned)."
+  insufficient_funds: {action: RETRY, timing: next_salary_cluster}
+  bank_technical: {action: RETRY, delay_hours: 4}
+  rate_limit: {action: RETRY, delay_hours: 24}
+  mandate_paused: {action: SEND_REMINDER, channel: SMS}
+  card_hard: {action: REQUEST_PM_UPDATE, channel: SMS}
+  mandate_closed: {action: SEND_PAYMENT_LINK, channel: SMS}
+  exhausted_low_value: STOP
+  exhausted_high_value: ESCALATE
+
+B3_RANDOM_LEGAL:
+  description: "Uniform random choice over the feasible action set (sanity baseline)."
+  stop_probability: 0.03

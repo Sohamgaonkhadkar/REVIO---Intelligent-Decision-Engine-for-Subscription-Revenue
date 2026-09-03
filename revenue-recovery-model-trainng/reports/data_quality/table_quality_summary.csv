@@ -1,0 +1,9 @@
+table,rows,columns,missing_cells,missing_pct_of_cells,duplicate_rows,memory_mb
+customers,20000,5,0,0.0,0,5.1
+subscriptions,22078,12,0,0.0,0,10.38
+payment_attempts,264936,11,238138,8.1714,0,58.88
+recovery_cases,103026,19,68826,3.516,0,44.1
+recovery_events,986365,9,0,0.0,0,443.03
+action_log,157423,20,203028,6.4485,0,85.64
+case_outcomes,103026,17,68826,3.9297,0,31.02
+ml_datamart,157423,45,203028,2.866,0,165.09

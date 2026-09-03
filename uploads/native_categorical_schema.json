@@ -1,0 +1,147 @@
+{
+  "features": [
+    "amount_inr",
+    "customer_tenure_days",
+    "subscription_age_days",
+    "prior_cycles_seen",
+    "prior_successes",
+    "prior_success_rate",
+    "prior_failed_cases_before",
+    "prior_recovered_cases_before",
+    "retries_used_before",
+    "contacts_sent_before",
+    "hours_since_open",
+    "decision_seq",
+    "hour_of_day",
+    "day_of_month",
+    "hours_to_next_cluster_slot",
+    "salary_day_proxy_dom",
+    "rail",
+    "bank_name",
+    "segment",
+    "plan_tier",
+    "value_tier",
+    "first_failure_class",
+    "failure_class_at_decision",
+    "instrument_fixed",
+    "age_band",
+    "state",
+    "locale_pref",
+    "day_of_week",
+    "in_salary_cluster",
+    "amount_inr_log1p",
+    "action_type",
+    "channel"
+  ],
+  "categorical_features": [
+    "rail",
+    "bank_name",
+    "segment",
+    "plan_tier",
+    "value_tier",
+    "first_failure_class",
+    "failure_class_at_decision",
+    "age_band",
+    "state",
+    "locale_pref",
+    "action_type",
+    "channel"
+  ],
+  "category_vocab": {
+    "rail": [
+      "UPI_AUTOPAY",
+      "CARD_SI",
+      "__UNKNOWN__"
+    ],
+    "bank_name": [
+      "PNB",
+      "INDUSIND",
+      "HDFC",
+      "YES_BANK",
+      "SBI",
+      "KOTAK",
+      "AXIS",
+      "ICICI",
+      "__UNKNOWN__"
+    ],
+    "segment": [
+      "OTT_STREAMING",
+      "EDUCATION",
+      "FITNESS",
+      "SAAS_SMB",
+      "NEWS_MEDIA",
+      "__UNKNOWN__"
+    ],
+    "plan_tier": [
+      "PREMIUM",
+      "STANDARD",
+      "BASIC",
+      "__UNKNOWN__"
+    ],
+    "value_tier": [
+      "MID",
+      "LOW",
+      "HIGH",
+      "__UNKNOWN__"
+    ],
+    "first_failure_class": [
+      "INSUFFICIENT_FUNDS",
+      "BANK_TECHNICAL",
+      "MANDATE_PAUSED",
+      "MANDATE_CLOSED",
+      "CARD_LOST_STOLEN",
+      "CARD_EXPIRED",
+      "__UNKNOWN__"
+    ],
+    "failure_class_at_decision": [
+      "INSUFFICIENT_FUNDS",
+      "RATE_LIMIT",
+      "BANK_TECHNICAL",
+      "MANDATE_PAUSED",
+      "MANDATE_CLOSED",
+      "CARD_LOST_STOLEN",
+      "CARD_EXPIRED",
+      "__UNKNOWN__"
+    ],
+    "age_band": [
+      "AGE_26_35",
+      "AGE_18_25",
+      "AGE_36_45",
+      "AGE_46_55",
+      "AGE_56_PLUS",
+      "__UNKNOWN__"
+    ],
+    "state": [
+      "RAJASTHAN",
+      "DELHI",
+      "MAHARASHTRA",
+      "TAMIL_NADU",
+      "TELANGANA",
+      "GUJARAT",
+      "ANDHRA_PRADESH",
+      "WEST_BENGAL",
+      "KARNATAKA",
+      "UTTAR_PRADESH",
+      "__UNKNOWN__"
+    ],
+    "locale_pref": [
+      "HI_EN",
+      "EN",
+      "HI",
+      "__UNKNOWN__"
+    ],
+    "action_type": [
+      "RETRY",
+      "SEND_PAYMENT_LINK",
+      "SEND_REMINDER",
+      "REQUEST_PM_UPDATE",
+      "__UNKNOWN__"
+    ],
+    "channel": [
+      "SMS",
+      "WHATSAPP",
+      "EMAIL",
+      "__UNKNOWN__"
+    ]
+  }
+}

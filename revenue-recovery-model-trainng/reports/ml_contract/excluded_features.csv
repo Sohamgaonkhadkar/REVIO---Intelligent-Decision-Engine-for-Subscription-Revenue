@@ -1,0 +1,19 @@
+column,classification,usable_for_ml,reason,source
+logging_policy,POLICY / LOGGING,False,"Describes the policy that generated/logged the observation. Retain for EDA and offline policy evaluation, not production prediction.",ml_datamart
+case_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart
+subscription_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart
+customer_id,IDENTIFIER,False,Join/group/split identifier. Preserved for data operations but excluded from X.,ml_datamart
+decision_ts_h,TEMPORAL SOURCE FIELD,False,Used to derive decision-time temporal features. Raw timestamp should not automatically enter X.,ml_datamart
+exec_ts_h,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart
+exec_delay_hours,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart
+exec_hour_of_day,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart
+exec_day_of_month,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart
+exec_in_salary_cluster,POST-DECISION / POSSIBLE LEAKAGE,False,Realized execution or terminal outcome information not safely available before the decision.,ml_datamart
+y,TARGET,False,Intervention outcome label. Never included in X.,ml_datamart
+response_kind,OUTCOME / LABEL METADATA,False,Censoring/response metadata. Not a decision-time predictor.,ml_datamart
+censored,OUTCOME / LABEL METADATA,False,Censoring/response metadata. Not a decision-time predictor.,ml_datamart
+customer_id,LATENT / PROHIBITED,False,Hidden simulator ground truth. Never join into ML features.,sidecar/latent_customers.csv
+intent_archetype,LATENT / PROHIBITED,False,Hidden simulator ground truth. Never join into ML features.,sidecar/latent_customers.csv
+salary_day_of_month,LATENT / PROHIBITED,False,Hidden simulator ground truth. Never join into ML features.,sidecar/latent_customers.csv
+payment_reliability_base,LATENT / PROHIBITED,False,Hidden simulator ground truth. Never join into ML features.,sidecar/latent_customers.csv
+responsiveness_base,LATENT / PROHIBITED,False,Hidden simulator ground truth. Never join into ML features.,sidecar/latent_customers.csv

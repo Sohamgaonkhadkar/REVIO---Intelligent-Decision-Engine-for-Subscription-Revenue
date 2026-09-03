@@ -1,0 +1,238 @@
+{
+  "dataset_name": "ai_revenue_recovery_interventions",
+  "dataset_version": "v1.0.0",
+  "sim_version": "0.3.0",
+  "seed": 20260823,
+  "rng": "numpy PCG64; content-addressable keyed stream keyed(seed,*keys)",
+  "generated_timestamp_utc": "2026-08-23T13:19:14.276652+00:00",
+  "sim_start": "2024-01-01",
+  "sim_days": 360,
+  "counts": {
+    "customers": 20000,
+    "subscriptions": 22078,
+    "payment_attempts": 264936,
+    "recovery_cases": 103026,
+    "recovery_events": 986365,
+    "action_log": 157423,
+    "case_outcomes": 103026,
+    "ml_datamart": 157423
+  },
+  "artifacts": {
+    "customers": {
+      "path": "data/generated/customers.parquet",
+      "sha256": "67d5d6bef4c6c91d9f6cc77ffaf5ca41a7286a70958a307044d21b29db8a8aa4",
+      "rows": 20000,
+      "columns": [
+        "customer_id",
+        "age_band",
+        "state",
+        "locale_pref",
+        "signed_up_date"
+      ]
+    },
+    "subscriptions": {
+      "path": "data/generated/subscriptions.parquet",
+      "sha256": "d08d3290e275771f7c11f618e77c7068edbb7b71585b0b62bf612c814925a63b",
+      "rows": 22078,
+      "columns": [
+        "subscription_id",
+        "customer_id",
+        "segment",
+        "plan_tier",
+        "plan_amount_inr",
+        "cadence",
+        "start_date",
+        "billing_day_of_month",
+        "rail",
+        "bank_name",
+        "mandate_max_amount_inr",
+        "status"
+      ]
+    },
+    "payment_attempts": {
+      "path": "data/generated/payment_attempts.parquet",
+      "sha256": "6b41421abbcabc0b97955fc8f12b6d21f9a00ba7851b7b4ab10eb84438918f80",
+      "rows": 264936,
+      "columns": [
+        "attempt_id",
+        "case_id",
+        "subscription_id",
+        "customer_id",
+        "ts_h",
+        "attempt_index",
+        "amount_inr",
+        "outcome",
+        "failure_class",
+        "is_recovery_attempt",
+        "ts_iso"
+      ]
+    },
+    "recovery_cases": {
+      "path": "data/generated/recovery_cases.parquet",
+      "sha256": "068827a4f9cdf0a285e61bfe608f31527950e2a8263954b8bdc91aaf541fa21f",
+      "rows": 103026,
+      "columns": [
+        "case_id",
+        "policy_id",
+        "subscription_id",
+        "customer_id",
+        "opened_ts_h",
+        "closed_ts_h",
+        "first_failure_class",
+        "current_failure_class",
+        "amount_at_risk_inr",
+        "value_tier",
+        "n_decisions",
+        "retries_used",
+        "contacts_sent",
+        "cost_total_inr",
+        "fatigue_total",
+        "resolution",
+        "recovered_flag",
+        "recovered_amount_inr",
+        "time_to_recovery_h"
+      ]
+    },
+    "recovery_events": {
+      "path": "data/generated/recovery_events.parquet",
+      "sha256": "23b5e25210ce8d40319a5d96dc7ae39b411c2f1de4820a86222401bcd85df312",
+      "rows": 986365,
+      "columns": [
+        "event_id",
+        "policy_id",
+        "case_id",
+        "subscription_id",
+        "customer_id",
+        "ts_h",
+        "event_type",
+        "detail_json",
+        "ts_iso"
+      ]
+    },
+    "action_log": {
+      "path": "data/generated/action_log.parquet",
+      "sha256": "06f606bb5a9243067830be47bfaaead71ee2f6c86a85973853d4d7d9f5ef8a4e",
+      "rows": 157423,
+      "columns": [
+        "action_id",
+        "policy_id",
+        "case_id",
+        "decision_seq",
+        "decision_ts_h",
+        "action_type",
+        "channel",
+        "exec_ts_h",
+        "exec_delay_hours",
+        "failure_class_at_decision",
+        "first_failure_class",
+        "rail",
+        "value_tier",
+        "retries_used_before",
+        "contacts_sent_before",
+        "hours_since_open",
+        "instrument_fixed",
+        "escalated",
+        "label_success",
+        "response_kind"
+      ]
+    },
+    "case_outcomes": {
+      "path": "data/generated/case_outcomes.parquet",
+      "sha256": "d5681bcda25b4159378da29d9a15b5eab9ea0f616045fe6b2b9c7b8afdf9d758",
+      "rows": 103026,
+      "columns": [
+        "policy_id",
+        "case_id",
+        "subscription_id",
+        "customer_id",
+        "opened_ts_h",
+        "closed_ts_h",
+        "resolution",
+        "recovered_flag",
+        "recovered_amount_inr",
+        "amount_at_risk_inr",
+        "retries_used",
+        "contacts_sent",
+        "cost_total_inr",
+        "fatigue_total",
+        "time_to_recovery_h",
+        "first_failure_class",
+        "recovery_rate"
+      ]
+    },
+    "ml_datamart": {
+      "path": "data/generated/ml_datamart.parquet",
+      "sha256": "1e6f352cb742391e5b2e224f605f17c4ebca6c5a8fd0c7d04366d74c759591f5",
+      "rows": 157423,
+      "columns": [
+        "logging_policy",
+        "case_id",
+        "subscription_id",
+        "customer_id",
+        "decision_seq",
+        "decision_ts_h",
+        "failure_class_at_decision",
+        "first_failure_class",
+        "rail",
+        "bank_name",
+        "segment",
+        "plan_tier",
+        "amount_inr",
+        "value_tier",
+        "retries_used_before",
+        "contacts_sent_before",
+        "hours_since_open",
+        "instrument_fixed",
+        "age_band",
+        "state",
+        "locale_pref",
+        "customer_tenure_days",
+        "subscription_age_days",
+        "sub_billing_day",
+        "prior_cycles_seen",
+        "prior_successes",
+        "prior_success_rate",
+        "prior_failed_cases_before",
+        "prior_recovered_cases_before",
+        "day_of_month",
+        "day_of_week",
+        "hour_of_day",
+        "in_salary_cluster",
+        "hours_to_next_cluster_slot",
+        "salary_day_proxy_dom",
+        "action_type",
+        "channel",
+        "exec_ts_h",
+        "exec_delay_hours",
+        "exec_hour_of_day",
+        "exec_day_of_month",
+        "exec_in_salary_cluster",
+        "y",
+        "response_kind",
+        "censored"
+      ]
+    }
+  },
+  "sidecar": {
+    "path": "data/generated/sidecar/latent_customers.parquet",
+    "note": "sealed latent truth; NEVER join into ml_datamart"
+  },
+  "sources": {
+    "reference_transactions": "skullagos5246/upi-transactions-2024-dataset (Kaggle, CC0)",
+    "reference_profile": "data/reference/reference_upi_profile.json",
+    "assumption_registry": "configs/registry/assumption_registry.yaml"
+  },
+  "provenance_notes": {
+    "payment_attempts": "BASE first renewal attempts only (one canonical paired-world stream); recovery retries are observable in recovery_events and action_log labels.",
+    "recovery/recovery_events/action_log/case_outcomes/ml_datamart": "logging policies B0_NONE/B1_PSP_PROXY/B2_DOCTRINE/B3_RANDOM_LEGAL.",
+    "latent_sidecar": "never join into ML rows (leakage)."
+  },
+  "known_limitations": [
+    "Ground truth is simulated, not observed merchant data.",
+    "Calendar uses fixed 30-day months; no festivals/holidays.",
+    "NPCI 1+3 modeled as a hard per-cycle budget, not scheduler time-slots.",
+    "Per-cycle balance is a latent sufficiency process, not a full bank ledger.",
+    "Contact label = positive response within 24h; censored rows flagged.",
+    "Logging policies are deterministic baselines, not randomized exploration \u2014 IPS/DR on B1-B3 is illustrative; B3 supplies stochasticity."
+  ]
+}

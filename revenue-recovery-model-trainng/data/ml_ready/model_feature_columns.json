@@ -1,0 +1,109 @@
+{
+  "target": "y",
+  "identifiers": [
+    "subscription_id",
+    "case_id",
+    "customer_id"
+  ],
+  "state_features": [
+    "amount_inr",
+    "customer_tenure_days",
+    "subscription_age_days",
+    "prior_cycles_seen",
+    "prior_successes",
+    "prior_success_rate",
+    "prior_failed_cases_before",
+    "prior_recovered_cases_before",
+    "retries_used_before",
+    "contacts_sent_before",
+    "hours_since_open",
+    "decision_seq",
+    "hour_of_day",
+    "day_of_month",
+    "hours_to_next_cluster_slot",
+    "salary_day_proxy_dom",
+    "rail",
+    "bank_name",
+    "segment",
+    "plan_tier",
+    "value_tier",
+    "first_failure_class",
+    "failure_class_at_decision",
+    "instrument_fixed",
+    "age_band",
+    "state",
+    "locale_pref",
+    "day_of_week",
+    "in_salary_cluster",
+    "amount_inr_log1p"
+  ],
+  "intervention_variables": [
+    "action_type",
+    "channel"
+  ],
+  "policy_variables": [
+    "logging_policy"
+  ],
+  "model_input_columns": [
+    "amount_inr",
+    "customer_tenure_days",
+    "subscription_age_days",
+    "prior_cycles_seen",
+    "prior_successes",
+    "prior_success_rate",
+    "prior_failed_cases_before",
+    "prior_recovered_cases_before",
+    "retries_used_before",
+    "contacts_sent_before",
+    "hours_since_open",
+    "decision_seq",
+    "hour_of_day",
+    "day_of_month",
+    "hours_to_next_cluster_slot",
+    "salary_day_proxy_dom",
+    "rail",
+    "bank_name",
+    "segment",
+    "plan_tier",
+    "value_tier",
+    "first_failure_class",
+    "failure_class_at_decision",
+    "instrument_fixed",
+    "age_band",
+    "state",
+    "locale_pref",
+    "day_of_week",
+    "in_salary_cluster",
+    "amount_inr_log1p",
+    "action_type",
+    "channel"
+  ],
+  "excluded_leakage_columns": [
+    "exec_ts_h",
+    "exec_in_salary_cluster",
+    "censored",
+    "exec_day_of_month",
+    "exec_hour_of_day",
+    "exec_delay_hours",
+    "response_kind"
+  ],
+  "rows_before": 157423,
+  "rows_after_missing_target_removal": 157423,
+  "missing_target_rows_removed": 0,
+  "engineered_features": {
+  "amount_inr_log1p": {
+    "formula": "log1p(amount_inr)",
+    "source_columns": [
+      "amount_inr"
+    ],
+    "learned_from_data": false,
+    "decision_time_available": true
+  }
+},
+  "learned_preprocessing": {
+    "fit_stage": "C4 after train/validation/test split",
+    "median_imputation": "training-only",
+    "clipping": "training-only if explicitly approved",
+    "rare_category_grouping": "training-only if explicitly approved"
+  }
+}

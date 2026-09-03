@@ -1,0 +1,46 @@
+column,available_at_case_open,available_at_decision,known_only_after_execution,post_outcome,usable_for_ml,classification,reason
+logging_policy,False,True,False,False,False,POLICY / LOGGING,"Describes the policy that generated/logged the observation. Retain for EDA and offline policy evaluation, not production prediction."
+case_id,True,True,False,False,False,IDENTIFIER,Join/group/split identifier. Preserved for data operations but excluded from X.
+subscription_id,True,True,False,False,False,IDENTIFIER,Join/group/split identifier. Preserved for data operations but excluded from X.
+customer_id,True,True,False,False,False,IDENTIFIER,Join/group/split identifier. Preserved for data operations but excluded from X.
+decision_seq,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+decision_ts_h,False,True,False,False,False,TEMPORAL SOURCE FIELD,Used to derive decision-time temporal features. Raw timestamp should not automatically enter X.
+failure_class_at_decision,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+first_failure_class,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+rail,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+bank_name,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+segment,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+plan_tier,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+amount_inr,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+value_tier,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+retries_used_before,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+contacts_sent_before,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+hours_since_open,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+instrument_fixed,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+age_band,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+state,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+locale_pref,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+customer_tenure_days,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+subscription_age_days,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+sub_billing_day,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+prior_cycles_seen,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+prior_successes,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+prior_success_rate,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+prior_failed_cases_before,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+prior_recovered_cases_before,False,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+day_of_month,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+day_of_week,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+hour_of_day,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+in_salary_cluster,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+hours_to_next_cluster_slot,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+salary_day_proxy_dom,True,True,False,False,True,OBSERVABLE DECISION-TIME FEATURE,Observable case/customer/payment state available at or before the decision.
+action_type,False,True,False,False,True,ACTION / INTERVENTION,Candidate intervention variable in the conditional propensity formulation.
+channel,False,True,False,False,True,ACTION / INTERVENTION,Candidate intervention variable in the conditional propensity formulation.
+exec_ts_h,False,False,True,False,False,POST-DECISION / POSSIBLE LEAKAGE,Realized execution or terminal outcome information not safely available before the decision.
+exec_delay_hours,False,False,True,False,False,POST-DECISION / POSSIBLE LEAKAGE,Realized execution or terminal outcome information not safely available before the decision.
+exec_hour_of_day,False,False,True,False,False,POST-DECISION / POSSIBLE LEAKAGE,Realized execution or terminal outcome information not safely available before the decision.
+exec_day_of_month,False,False,True,False,False,POST-DECISION / POSSIBLE LEAKAGE,Realized execution or terminal outcome information not safely available before the decision.
+exec_in_salary_cluster,False,False,True,False,False,POST-DECISION / POSSIBLE LEAKAGE,Realized execution or terminal outcome information not safely available before the decision.
+y,False,False,False,True,False,TARGET,Intervention outcome label. Never included in X.
+response_kind,False,False,False,True,False,OUTCOME / LABEL METADATA,Censoring/response metadata. Not a decision-time predictor.
+censored,False,False,False,True,False,OUTCOME / LABEL METADATA,Censoring/response metadata. Not a decision-time predictor.

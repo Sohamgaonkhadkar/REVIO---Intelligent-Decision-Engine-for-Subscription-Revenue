@@ -1,0 +1,41 @@
+# rule pack: card_si v1 — card standing-instruction (e-mandate) cases.
+pack_id: card_si
+version: 1
+rail: card_si
+tz: Asia/Kolkata
+
+budgets:
+  retry:
+    max_retries: 3            # FACT (NPCI 1+3 applies to e-mandates)
+    rule_id: R-BUDGET-RETRY-1P3
+  contacts:
+    max_contacts: 2
+    cooldown_hours: 20
+    rule_id: R-CONTACT-CAP-2
+
+windows:
+  quiet_hours: "21:00-08:00"
+  legal_execution: "08:00-21:00"
+  contact_hours: "09:00-21:00"
+  bins: [W08_11, W11_14, W14_17, W17_21]
+  window_rule_id: R-WINDOW-LEGAL
+
+class_eligibility:
+  non_retryable: [MANDATE_PAUSED, MANDATE_CLOSED, CARD_EXPIRED, CARD_LOST_STOLEN, UNMAPPED]
+  pm_update_classes: [MANDATE_CLOSED, CARD_EXPIRED, CARD_LOST_STOLEN]
+  unmapped_policy: non_retryable
+
+mandate:
+  retry_requires: [active]
+
+amount:
+  max_auto_amount_inr: 15000  # RBI e-mandate cap (FACT)
+
+state_rules:
+  terminal_absorbing: true
+  opt_out_blocks_contact: true
+  kill_scopes: [global, merchant, rail, rule_pack, case]
+
+stop_escalate:
+  horizon_hours: 336
+  unresponsive_nudges_before_mandate_dead: 2

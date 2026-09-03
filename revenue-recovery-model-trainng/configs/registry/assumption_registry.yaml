@@ -1,0 +1,86 @@
+# Assumption registry — every behavioral parameter in Dataset V1 with provenance.
+# tag: FACT (documented) | DATA (measured from selected reference dataset) | ASSUMED | DECISION
+
+- name: npci_retry_budget
+  value: 3
+  tag: FACT
+  source: "NPCI Aug-2025 UPI AutoPay rules (reported): 1 execution + max 3 retries per mandate cycle — paytm.com/blog carrier; Stripe India e-mandate docs"
+  used_in: constraints
+
+- name: execution_window_non_peak
+  value: "00:00-07:00 IST"
+  tag: FACT
+  source: "NPCI Aug-2025 mandate executions restricted to non-peak hours (Paytm/NPCI summary); vistarkriya integration guide"
+  used_in: constraints, engine
+
+- name: debit_cap_general
+  value: 15000
+  tag: FACT
+  source: "RBI e-mandate framework: ₹15,000 general per-debit cap (Stripe India recurring payments docs)"
+  used_in: population, domain models
+
+- name: case_horizon_days
+  value: 14
+  tag: ASSUMED
+  source: "developer-set; PSP dunning windows commonly 2-4 weeks (vendor docs); sensitivity target later"
+  used_in: engine
+
+- name: first_attempt_failure_band_upi
+  value: "0.08-0.15"
+  tag: ASSUMED_CALIBRATION_TARGET
+  source: "productgrowth.in practitioner estimate (UPI AutoPay 8-15% vs cards 2-3%); NPCI-via-Livemint Aug-2025 spike 55-90% is a stressed-month regime, NOT the base regime"
+  used_in: validation anchors
+
+- name: first_attempt_failure_band_card
+  value: "0.02-0.03"
+  tag: ASSUMED_CALIBRATION_TARGET
+  source: "productgrowth.in practitioner estimate"
+  used_in: validation anchors
+
+- name: notification_response_hazard
+  value: "responsiveness_base(intent) x channel_mult x fatigue_decay x recency_boost"
+  tag: ASSUMED
+  source: "hazard form = developer model; dunning response doctrine (Omnisend/Klaviyo carriers, Phase 1) motivates recency boost only"
+  used_in: engine
+
+- name: retry_timing_doctrine
+  value: "insufficient-funds recoveries cluster post-payday; technical declines recover within hours"
+  tag: ASSUMED
+  source: "vendor doctrine tables: Finsi failed-payment-recovery guide; Slicker Visa/MC retry rules (both marketing-adjacent; used as priors only)"
+  used_in: policies.B2, world balance process
+
+- name: mandate_pause_available
+  value: true
+  tag: FACT
+  source: "Users can pause/cancel UPI mandates in their UPI app (Livemint NPCI report; Recurly UPI AutoPay docs)"
+  used_in: world
+
+- name: npci_decline_taxonomy_business_vs_technical
+  value: true
+  tag: FACT
+  source: "NPCI classifies AutoPay failures as business vs technical declines (Livemint)"
+  used_in: domain taxonomy
+
+- name: population_priors
+  value: "bank/state/age shares measured from reference profile; segments/tiers/locale assumed"
+  tag: DATA
+  source: "data/reference/reference_upi_profile.json (UPI Transactions 2024, CC0 synthetic)"
+  used_in: population
+
+- name: costs_and_friction
+  value: "see configs/costs.yaml"
+  tag: ASSUMED
+  source: "developer-set; UPI TDR 0% (RBI mandate) noted; infra/message costs approximate"
+  used_in: engine, decision accounting
+
+- name: sim_month_30_days
+  value: true
+  tag: DECISION
+  source: "calendric simplification for V1; renewal days 1-28 make month length immaterial except edges"
+  used_in: engine
+
+- name: pre_debit_notifications_ambient
+  value: "assumed compliant (24h prior) but not logged as events in V1"
+  tag: DECISION
+  source: "RBI requires 24h pre-debit alert (Stripe India docs); omitted from event log to keep V1 lean"
+  used_in: docs/limitations

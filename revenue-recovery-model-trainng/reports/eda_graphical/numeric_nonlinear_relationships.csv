@@ -1,0 +1,17 @@
+feature,binned_success_rate_spread
+hour_of_day,0.28403828589477187
+amount_inr,0.2512184357375015
+prior_recovered_cases_before,0.1979603675624343
+day_of_month,0.11027629697484065
+decision_seq,0.10991521122648742
+sub_billing_day,0.09691481158700962
+hours_to_next_cluster_slot,0.0724668914527132
+hours_since_open,0.06591417440447417
+prior_success_rate,0.06061999890088596
+prior_cycles_seen,0.051364420875671224
+day_of_week,0.0496432877889488
+prior_successes,0.047368677363666595
+subscription_age_days,0.02493584927092346
+customer_tenure_days,0.018533583348263216
+prior_failed_cases_before,0.016388454362670862
+salary_day_proxy_dom,0.009579342307085903

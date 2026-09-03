@@ -1,0 +1,12 @@
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.env
+pgdata/
+
+# Generated large datasets
+revenue-recovery-model-trainng/data/generated_csv/*.csv
+revenue-recovery-model-trainng/data/normalized/*.csv
+
+# Keep small metadata/configuration files if required

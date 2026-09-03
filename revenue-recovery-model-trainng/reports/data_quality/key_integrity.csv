@@ -1,0 +1,8 @@
+table,key,rows,null_ids,duplicate_ids,unique_ids,is_unique
+customers,customer_id,20000,0,0,20000,True
+subscriptions,subscription_id,22078,0,0,22078,True
+payment_attempts,attempt_id,264936,0,0,264936,True
+recovery_events,event_id,986365,0,605907,380458,False
+action_log,action_id,157423,0,92497,64926,False
+recovery_cases,policy_id + case_id,103026,0,0,103026,True
+case_outcomes,policy_id + case_id,103026,0,0,103026,True

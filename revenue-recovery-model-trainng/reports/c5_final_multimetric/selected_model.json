@@ -1,0 +1,26 @@
+{
+  "optimization": {
+    "type": "multi_objective",
+    "objectives": [
+      "maximize_pr_auc",
+      "maximize_roc_auc",
+      "minimize_log_loss",
+      "minimize_brier"
+    ]
+  },
+  "selection": {
+    "selected_trial": 34,
+    "rule": "highest validation PR-AUC among Pareto-optimal candidates, with Log Loss and Brier as tie-breakers"
+  },
+  "parameters": {
+    "max_depth": 10,
+    "learning_rate": 0.021459711073767162,
+    "min_child_weight": 3,
+    "subsample": 0.914399817887789,
+    "colsample_bytree": 0.9433904720436755,
+    "gamma": 2.1849656090391902,
+    "reg_alpha": 1.8179248677042483,
+    "reg_lambda": 2.806510548553804
+  },
+  "n_estimators": 1500
+}

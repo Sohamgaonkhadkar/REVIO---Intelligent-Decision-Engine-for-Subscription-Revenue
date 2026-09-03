@@ -1,0 +1,13 @@
+table,column,null_count,non_numeric_count,min_value,max_value
+payment_attempts,ts_h,0,0,5.0,8573.0
+recovery_cases,opened_ts_h,0,0,6.0,8574.0
+recovery_cases,closed_ts_h,0,0,6.0,8954.0
+recovery_cases,time_to_recovery_h,68826,0,3.0,385.0
+recovery_events,ts_h,0,0,6.0,8954.0
+action_log,decision_ts_h,0,0,6.0,8836.0
+action_log,exec_ts_h,0,0,8.0,8837.0
+case_outcomes,opened_ts_h,0,0,6.0,8574.0
+case_outcomes,closed_ts_h,0,0,6.0,8954.0
+case_outcomes,time_to_recovery_h,68826,0,3.0,385.0
+ml_datamart,decision_ts_h,0,0,6.0,8836.0
+ml_datamart,exec_ts_h,0,0,8.0,8837.0

@@ -1,0 +1,18 @@
+{
+  "optimization_metric": "pr_auc",
+  "cv": "5-fold StratifiedGroupKFold",
+  "group": "case_id",
+  "best_cv_pr_auc": 0.8111897351655477,
+  "best_params": {
+    "n_estimators": 750,
+    "max_depth": 9,
+    "learning_rate": 0.021282443665857322,
+    "min_child_weight": 1,
+    "subsample": 0.9088249503896849,
+    "colsample_bytree": 0.665998401220248,
+    "gamma": 1.6973264832524302,
+    "reg_alpha": 1.4204811707801293e-05,
+    "reg_lambda": 23.009912471175372
+  },
+  "selected_validation_threshold": 0.4649999999999998
+}

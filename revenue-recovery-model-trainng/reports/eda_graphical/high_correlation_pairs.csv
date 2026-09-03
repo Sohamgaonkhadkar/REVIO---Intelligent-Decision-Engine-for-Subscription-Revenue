@@ -1,0 +1,5 @@
+feature_1,feature_2,spearman_abs,abs_correlation
+decision_seq,hours_since_open,0.9280103193151029,0.9280103193151029
+sub_billing_day,day_of_month,0.8820511573262609,0.8820511573262609
+prior_successes,prior_success_rate,0.8329336075333588,0.8329336075333588
+prior_cycles_seen,prior_successes,0.8281394521254543,0.8281394521254543

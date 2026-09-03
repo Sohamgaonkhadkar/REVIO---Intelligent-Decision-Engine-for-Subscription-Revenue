@@ -1,0 +1,3 @@
+feature,formula,source_columns
+amount_inr_log1p,log1p(amount_inr),"[""amount_inr""]"
+salary_day_proxy_dom,raw observable salary-day proxy; no population bin fitted in C3,"[""salary_day_proxy_dom""]"
