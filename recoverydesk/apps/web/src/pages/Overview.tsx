@@ -1,279 +1,691 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { api } from "../api/client";
-import { QueryState, inr, pct, ago } from "../components/ui";
-
-function EngineStrip({ outcomes }: { outcomes: any }) {
-  const active = (outcomes.cases_by_state?.OPEN_DECISION ?? 0) + (outcomes.cases_by_state?.ACTION_PENDING ?? 0) + (outcomes.cases_by_state?.WAITING ?? 0) + (outcomes.cases_by_state?.AWAITING_CUSTOMER ?? 0);
-  const openCount = outcomes.cases_total ?? 0;
-  
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', background: 'var(--bg-1)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden', marginBottom: 24 }}>
-      <div style={{ padding: '20px 24px' }}>
-        <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Detect</div>
-        <div className="num-display" style={{ fontSize: 28, color: 'var(--ink-1)', display: 'block' }}>{openCount}</div>
-      </div>
-      <div style={{ padding: '20px 24px', borderLeft: '1px solid var(--line)' }}>
-        <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Decide</div>
-        <div className="num-display text-ink1" style={{ fontSize: 28, display: 'block' }}>{active}</div>
-      </div>
-      <div style={{ padding: '20px 24px', borderLeft: '1px solid var(--line)' }}>
-        <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Execute</div>
-        <div className="num-display text-ink1" style={{ fontSize: 28, display: 'block' }}>{outcomes.compliance?.attempts_executed ?? outcomes.attempts_consumed ?? 0}</div>
-      </div>
-      <div style={{ padding: '20px 24px', borderLeft: '1px solid var(--line)' }}>
-        <div className="eyebrow text-good" style={{ marginBottom: 8, display: 'block' }}>Recover</div>
-        <div className="num-display text-good" style={{ fontSize: 28, display: 'block' }}>{inr(outcomes.recovered_inr)}</div>
-      </div>
-    </div>
-  );
-}
-
-function BaselineComparison({ base, out }: { base: any; out: any }) {
-  const p_rec = out.recovered_inr || 0;
-  
-  return (
-    <div className="card" style={{ marginTop: 40 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 className="section-title" style={{ margin: 0 }}>Baseline Comparison</h2>
-        <Link to="/outcomes" className="chip info">View full methodology →</Link>
-      </div>
-      
-      <div style={{ display: 'grid', gap: 16 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 140px', alignItems: 'center', gap: 24 }}>
-          <div className="text-ink1" style={{ fontSize: 14, fontWeight: 500 }}>No intervention</div>
-          <div className="bar-track" style={{ height: 8, background: 'var(--track)', borderRadius: 99 }}>
-             <div style={{ width: `${(base?.baselines?.B0?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
-          </div>
-          <div className="num-table text-ink2" style={{ textAlign: 'right' }}>{inr(base?.baselines?.B0?.recovered_inr || 0)}</div>
-        </div>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 140px', alignItems: 'center', gap: 24 }}>
-          <div className="text-ink1" style={{ fontSize: 14, fontWeight: 500 }}>PSP-default retries</div>
-          <div className="bar-track" style={{ height: 8, background: 'var(--track)', borderRadius: 99 }}>
-             <div style={{ width: `${(base?.baselines?.B1?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
-          </div>
-          <div className="num-table text-ink2" style={{ textAlign: 'right' }}>{inr(base?.baselines?.B1?.recovered_inr || 0)}</div>
-        </div>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 140px', alignItems: 'center', gap: 24 }}>
-          <div className="text-ink1" style={{ fontSize: 14, fontWeight: 500 }}>Static doctrine policy</div>
-          <div className="bar-track" style={{ height: 8, background: 'var(--track)', borderRadius: 99 }}>
-             <div style={{ width: `${(base?.baselines?.B2?.recovered_inr / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99, transition: 'width 1s ease' }} />
-          </div>
-          <div className="num-table text-ink2" style={{ textAlign: 'right' }}>{inr(base?.baselines?.B2?.recovered_inr || 0)}</div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 140px', alignItems: 'center', gap: 24, background: 'rgba(46, 139, 112, 0.1)', padding: '16px', margin: '8px -16px 0', borderRadius: 8, border: '1px solid rgba(46, 139, 112, 0.2)' }}>
-          <div className="text-good" style={{ fontSize: 14, fontWeight: 700 }}>Revenue Recovery</div>
-          <div className="bar-track" style={{ height: 8, background: 'var(--bg-2)', borderRadius: 99 }}>
-             <div style={{ width: `${(p_rec / (base?.population?.at_risk_inr || 1)) * 100}%`, height: '100%', background: 'var(--good)', borderRadius: 99, boxShadow: '0 0 10px rgba(46, 139, 112, 0.3)', transition: 'width 1s ease' }} />
-          </div>
-          <div className="num-table text-good" style={{ textAlign: 'right', fontWeight: 700, fontSize: 15 }}>{inr(p_rec)}</div>
-        </div>
-      </div>
-      
-      <div className="text-ink3" style={{ fontSize: 13, marginTop: 24 }}>
-        Performance vs baselines on identical population. Evaluated over {(base?.population?.cases || 0).toLocaleString()} simulated cases.
-      </div>
-    </div>
-  );
-}
-
-function LiveActivity({ events }: { events: any[] }) {
-  if (!events || events.length === 0) {
-    return <div className="card"><div className="text-ink3">Quiet — cases advance on worker cycles.</div></div>;
-  }
-  
-  return (
-    <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 className="section-title" style={{ margin: 0 }}>Live Activity</h2>
-        <Link to="/audit" className="chip info">View Audit Journal →</Link>
-      </div>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {events.map((e) => (
-          <div key={e.event_id} style={{ display: 'grid', gridTemplateColumns: '1fr max-content', gap: 16 }}>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink-1)' }}>
-                {e.event_type.replaceAll("_", " ")}
-              </div>
-              <div className="text-ink3" style={{ fontSize: 13, marginTop: 4 }}>
-                Case <Link to={`/cases/${e.case_id}`} className="mono text-info">{e.case_id.split("-")[0]}</Link>
-              </div>
-            </div>
-            <div className="text-ink3" style={{ fontSize: 13, fontWeight: 500 }}>
-              {ago(e.occurred_at)}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+} from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Activity,
+  ArrowDownLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  CircleCheck,
+  Clock3,
+  Download,
+  Layers2,
+  Pause,
+  Play,
+  RotateCcw,
+  ShieldCheck,
+  TrendingUp,
+  X,
+} from "lucide-react";
+import { DateRangeControl } from "../components/ConsoleShell";
+import {
+  BaselineComparison,
+  MoneyMovement,
+  RevenuePulse,
+} from "../components/charts";
+import { HERO_IMAGE, PhotoStories } from "../components/PhotoStories";
+import { RecoveryFlow } from "../components/RecoveryFlow";
+import {
+  NumberFlow,
+  PageHeading,
+  SectionHeading,
+  Tooltip,
+} from "../components/ui";
+import {
+  allJournalEntries,
+  cases,
+  formatINR,
+  getMetrics,
+  type Rail,
+} from "../data/simulation";
+import {
+  chronologicalEvents,
+  dateOnly,
+  exportFile,
+  timeOnly,
+} from "../data/workspace";
+import { useWorkspace } from "../state/Workspace";
 
 export default function Overview() {
-  const o = useQuery({ queryKey: ["outcomes"], queryFn: () => api("/api/outcomes"), refetchInterval: 5_000 });
-  const b = useQuery({ queryKey: ["baselines"], queryFn: () => api("/api/baselines"), refetchInterval: 15_000 });
-  const e = useQuery({ queryKey: ["events_overview"], queryFn: () => api("/api/events?limit=8"), refetchInterval: 5_000 });
-
+  const w = useWorkspace();
+  const m = useMemo(() => getMetrics(w.cohort), [w.cohort]);
+  const [rail, setRail] = useState<"ALL" | Rail>("ALL");
+  const recoveredCount = w.cohort.filter(
+    (c) => c.status === "RECOVERED",
+  ).length;
+  const heroRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
+  const featured = cases[0];
+  const featuredSelected = featured.candidates.find((a) => a.selected)!;
+  const featuredPermitted = featured.candidates.filter((a) => a.eligible).length;
+  const featuredBlocked = featured.candidates.filter((a) => !a.eligible).length;
+  const [heroStage, setHeroStage] = useState(0);
+  const [heroHeld, setHeroHeld] = useState(false);
+  useEffect(() => {
+    if (reducedMotion || heroHeld) return;
+    const timer = setInterval(
+      () => setHeroStage((stage) => (stage + 1) % 4),
+      2600,
+    );
+    return () => clearInterval(timer);
+  }, [reducedMotion, heroHeld]);
+  const moveHeroLight = (e: React.PointerEvent<HTMLElement>) => {
+    const node = heroRef.current;
+    if (!node || reducedMotion) return;
+    const rect = node.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / Math.max(1, rect.width) - 0.5;
+    const y = (e.clientY - rect.top) / Math.max(1, rect.height) - 0.5;
+    node.style.setProperty("--hero-x", `${(x * 14).toFixed(2)}px`);
+    node.style.setProperty("--hero-y", `${(y * 10).toFixed(2)}px`);
+    node.style.setProperty("--hero-nx", `${(x * -8).toFixed(2)}px`);
+    node.style.setProperty("--hero-ny", `${(y * -6).toFixed(2)}px`);
+    node.style.setProperty(
+      "--hero-glow-x",
+      `${(((e.clientX - rect.left) / Math.max(1, rect.width)) * 100).toFixed(1)}%`,
+    );
+    node.style.setProperty(
+      "--hero-glow-y",
+      `${(((e.clientY - rect.top) / Math.max(1, rect.height)) * 100).toFixed(1)}%`,
+    );
+  };
+  const exportSnapshot = () => {
+    exportFile("revio-synthetic-overview.json", {
+      range: w.range,
+      asOf: new Date(w.at).toISOString(),
+      metrics: m,
+      cases: w.cohort.map((c) => ({
+        id: c.id,
+        amount: c.amount,
+        status: c.status,
+      })),
+    });
+    w.notify("Synthetic overview snapshot exported.");
+  };
   return (
-    <QueryState q={o} empty={(x) => x.cases_total === 0}>
-      {(out) => {
-        const active = (out.cases_by_state?.OPEN_DECISION ?? 0) + (out.cases_by_state?.ACTION_PENDING ?? 0) + (out.cases_by_state?.WAITING ?? 0) + (out.cases_by_state?.AWAITING_CUSTOMER ?? 0);
-        const stopped = out.cases_by_state?.STOPPED ?? 0;
-        const escalated = out.cases_by_state?.ESCALATED ?? 0;
-        const complianceV = (out.compliance?.violations_retry_budget || 0) + (out.compliance?.violations_contact_cap || 0) + (out.compliance?.violations_post_terminal || 0);
-        const avg_time = out.avg_time_to_recover_h ? `${out.avg_time_to_recover_h}h` : '—';
-        
-        return (
-          <div className="page-with-hero">
-            <div className="page-hero-bg hero-overview" />
-            <EngineStrip outcomes={out} />
-            
-            {/* HERO FINANCIAL METRICS */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16, marginBottom: 40 }}>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Still at risk</div>
-                <div className="text-money num-display" style={{ fontSize: 24, display: 'block' }}>{inr(out.at_risk_inr - out.recovered_inr)}</div>
-              </div>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Active cases</div>
-                <div className="num-display" style={{ fontSize: 24, color: 'var(--ink-1)', display: 'block' }}>{active}</div>
-              </div>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow text-warn" style={{ marginBottom: 8, display: 'block' }}>Escalated</div>
-                <div className="num-display text-warn" style={{ fontSize: 24, display: 'block' }}>{escalated}</div>
-                <div className="text-ink3" style={{ fontSize: 11, marginTop: 4 }}>with a human</div>
-              </div>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Stopped</div>
-                <div className="num-display" style={{ fontSize: 24, color: 'var(--ink-1)', display: 'block' }}>{stopped}</div>
-                <div className="text-ink3" style={{ fontSize: 11, marginTop: 4 }}>closed</div>
-              </div>
-              <div className="card" style={{ padding: '16px', borderColor: complianceV === 0 ? 'var(--good)' : 'var(--bad)', background: complianceV === 0 ? 'rgba(46, 139, 112, 0.05)' : 'rgba(199, 91, 91, 0.05)' }}>
-                <div className="eyebrow" style={{ color: complianceV === 0 ? 'var(--good)' : 'var(--bad)', marginBottom: 8, display: 'block' }}>Compliance</div>
-                <div className={`num-display ${complianceV === 0 ? 'text-good' : 'text-bad'}`} style={{ fontSize: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {complianceV === 0 ? "●" : "!"} {complianceV} violations
-                </div>
-              </div>
+    <>
+      <PageHeading
+        title="Overview"
+        description="Money is still sitting in failed debits. Start there."
+        actions={
+          <>
+            <DateRangeControl />
+            <button
+              className="btn primary"
+              onClick={w.replay ? w.stopReplay : w.startReplay}
+            >
+              {w.replay ? <X size={13} /> : <Play size={12} />}
+              {w.replay ? "Exit replay" : "Replay the ledger"}
+            </button>
+          </>
+        }
+      />
+      <AnimatePresence>
+        {w.replay && (
+          <motion.div
+            className="simulation-playback"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <div>
+              <Activity size={15} />
+              <strong>Replaying the ledger</strong>
+              <span>
+                {dateOnly(w.at)}, {timeOnly(w.at)} IST
+              </span>
+              <span>
+                {w.cursor + 1} / {chronologicalEvents.length} recorded events
+              </span>
             </div>
+            <progress max={chronologicalEvents.length} value={w.cursor + 1} />
+            <div>
+              <button
+                className="icon-button"
+                onClick={w.toggleReplay}
+                aria-label={
+                  w.playing ? "Pause simulation" : "Resume simulation"
+                }
+              >
+                {w.playing ? <Pause size={14} /> : <Play size={14} />}
+              </button>
+              <button
+                className="icon-button"
+                onClick={w.restartReplay}
+                aria-label="Restart simulation"
+              >
+                <RotateCcw size={14} />
+              </button>
+            </div>
+            <p>
+              Historical synthetic events only. All headline metrics and charts
+              reflect this replay position.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* SECOND ROW - NEW AVERAGE TIME METRIC */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 40 }}>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Average time to recover</div>
-                <div className="num-display" style={{ fontSize: 24, color: 'var(--ink-1)', display: 'block' }}>{avg_time}</div>
-              </div>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Recovery Rate</div>
-                <div className="num-display" style={{ fontSize: 24, color: 'var(--ink-1)', display: 'block' }}>{pct(out.recovery_rate)}</div>
-              </div>
-              <div className="card" style={{ padding: '16px' }}>
-                <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Total cases</div>
-                <div className="num-display" style={{ fontSize: 24, color: 'var(--ink-1)', display: 'block' }}>{out.cases_total}</div>
-              </div>
+      <section
+        className="overview-hero luminous-hero"
+        data-tour="overview"
+        ref={heroRef}
+        onPointerMove={moveHeroLight}
+        onPointerLeave={() => {
+          heroRef.current?.style.setProperty("--hero-x", "0px");
+          heroRef.current?.style.setProperty("--hero-y", "0px");
+          heroRef.current?.style.setProperty("--hero-nx", "0px");
+          heroRef.current?.style.setProperty("--hero-ny", "0px");
+        }}
+      >
+        <div className="hero-aurora" aria-hidden="true" />
+        <div className="hero-copy">
+          <motion.div
+            initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="hero-eyebrow">
+              <span />
+              FAILED DEBITS · RECOVERY QUEUE
             </div>
+            <h2>
+              Don’t hit retry.
+              <br />
+              <span>Make it count.</span>
+            </h2>
+            <p>
+              REVIO checks what is allowed, scores only those options, then
+              picks the move most likely to pay for itself. That’s the whole
+              trick.
+            </p>
+          </motion.div>
+          <motion.div
+            className="hero-financial luminous-metric"
+            initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.14 }}
+          >
+            <span className="hero-financial-label">Money brought back</span>
+            <div>
+              <NumberFlow value={m.recovered} className="hero-number" />
+              <span className="hero-recovery-check">
+                <Check size={14} />
+              </span>
+            </div>
+            <span className="hero-metric-caption">
+              <span>SIMULATED OUTCOMES</span>
+              <i />
+              {recoveredCount} payments recovered
+            </span>
+          </motion.div>
+          <motion.div
+            className="hero-actions"
+            initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.24 }}
+          >
+            <button className="btn primary" onClick={() => w.navigate("lab")}>
+              See how REVIO decides <ArrowUpRight size={14} />
+            </button>
+            <button className="btn glass-btn" onClick={() => w.navigate("cases")}>
+              Work the queue
+            </button>
+          </motion.div>
+        </div>
 
-            <QueryState q={b}>
-              {(base) => <BaselineComparison base={base} out={out} />}
-            </QueryState>
-            
-            <div style={{ marginTop: 40, marginBottom: 40 }}>
-              <QueryState q={b}>
-                {(base) => {
-                  const rr_timing = base?.recoverydesk?.recovery_timing_counts || {};
-                  const b2_timing = base?.baselines?.B2?.recovery_timing_counts || {};
-                  const max_val = Math.max(...Object.values(rr_timing as Record<string, number>), ...Object.values(b2_timing as Record<string, number>), 1);
-                  
-                  return (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
-                      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <h2 className="section-title" style={{ margin: 0 }}>When recoveries land · REVIO</h2>
-                        </div>
-                        
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'flex-end', height: 100, gap: 8, paddingBottom: 8, borderBottom: '1px solid var(--line)' }}>
-                            {Object.entries(rr_timing).map(([k, v]: [string, any]) => (
-                              <div key={k} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                <div className="text-good" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>{v > 0 ? v : ''}</div>
-                                <div style={{ width: '100%', background: 'var(--good)', height: (v / max_val) * 76, minHeight: v > 0 ? 4 : 0, borderRadius: '4px 4px 0 0', boxShadow: '0 -4px 12px rgba(46, 139, 112, 0.3)' }} />
-                              </div>
-                            ))}
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                            {Object.keys(rr_timing).map(k => <div key={k} className="text-ink3" style={{ fontSize: 11, flex: 1, textAlign: 'center' }}>{k}</div>)}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="card dark" style={{ padding: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-                          <h2 className="section-title" style={{ margin: 0, color: 'var(--ink-side-1)' }}>When recoveries land · fixed timing playbook</h2>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', height: 100, gap: 8, paddingBottom: 8, borderBottom: '1px solid var(--line-side)' }}>
-                          {Object.entries(b2_timing).map(([k, v]: [string, any]) => (
-                            <div key={k} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-                              <div className="text-ink-side-2" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>{v > 0 ? Math.round(v) : ''}</div>
-                              <div style={{ width: '100%', background: 'var(--ink-side-2)', opacity: 0.5, height: (v / max_val) * 76, minHeight: v > 0 ? 4 : 0, borderRadius: '4px 4px 0 0' }} />
-                            </div>
-                          ))}
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                          {Object.keys(b2_timing).map(k => <div key={k} className="text-ink-side-2" style={{ fontSize: 11, flex: 1, textAlign: 'center' }}>{k}</div>)}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }}
-              </QueryState>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginTop: 40, marginBottom: 40 }}>
-              <QueryState q={e}>
-                {(evts) => <LiveActivity events={evts.items} />}
-              </QueryState>
+        <div className="hero-visual">
+          <motion.figure
+            className="hero-photo-wrap"
+            initial={
+              reducedMotion
+                ? false
+                : { opacity: 0.25, clipPath: "inset(0 0 0 22%)" }
+            }
+            animate={{ opacity: 1, clipPath: "inset(0 0 0 0%)" }}
+            transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <img
+              src={HERO_IMAGE}
+              alt="Close-up of a smartphone being used for a contactless payment at a modern payment terminal"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+            />
+            <span className="hero-photo-sheen" aria-hidden="true" />
+            <figcaption>
+              Payment technology · Photograph by Anna Shvets / Pexels
+            </figcaption>
+          </motion.figure>
 
-              <div className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                  <h2 className="section-title" style={{ margin: 0 }}>Why payments failed</h2>
-                  <div className="eyebrow">All {out.cases_total} cases</div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {Object.entries(out.by_failure_class || {}).sort((a: any, b: any) => b[1].inr - a[1].inr).map(([cls, stat]: [string, any]) => (
-                    <div key={cls} style={{ display: 'grid', gridTemplateColumns: '1fr max-content 40px', alignItems: 'center', gap: 16 }}>
-                      <div className="text-ink1" style={{ fontSize: 14 }}>{cls.replaceAll("_", " ")}</div>
-                      <div className="bar-track" style={{ height: 4, width: 80, background: 'var(--line)', borderRadius: 99 }}>
-                         <div style={{ width: `${(stat.n / out.cases_total) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99 }} />
-                      </div>
-                      <div className="num-display" style={{ fontSize: 16, textAlign: 'right' }}>{stat.n}</div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--line)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                    <h2 className="section-title" style={{ margin: 0, fontSize: 16 }}>Rail breakdown</h2>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {Object.entries(out.by_rail || {}).sort((a: any, b: any) => b[1].inr - a[1].inr).map(([rail, stat]: [string, any]) => (
-                      <div key={rail} style={{ display: 'grid', gridTemplateColumns: '1fr max-content 40px', alignItems: 'center', gap: 16 }}>
-                        <div className="text-ink1" style={{ fontSize: 14 }}>{rail === 'upi_autopay' ? 'UPI AutoPay' : 'Card SI'}</div>
-                        <div className="bar-track" style={{ height: 4, width: 80, background: 'var(--line)', borderRadius: 99 }}>
-                           <div style={{ width: `${(stat.n / out.cases_total) * 100}%`, height: '100%', background: 'var(--ink-2)', borderRadius: 99 }} />
-                        </div>
-                        <div className="num-display" style={{ fontSize: 16, textAlign: 'right' }}>{stat.n}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+          <button
+            className={`hero-chip chip-detected ${heroStage === 0 ? "active" : ""}`}
+            onMouseEnter={() => {
+              setHeroStage(0);
+              setHeroHeld(true);
+            }}
+            onFocus={() => {
+              setHeroStage(0);
+              setHeroHeld(true);
+            }}
+            onClick={() => w.navigate(`case/${featured.id}`)}
+          >
+            <span>It failed</span>
+            <strong>
+              {formatINR(featured.amount)} · {featured.rail}
+            </strong>
+            <small>{featured.failureReason}</small>
+          </button>
+          <button
+            className={`hero-chip chip-evaluation ${heroStage === 1 ? "active" : ""}`}
+            onMouseEnter={() => {
+              setHeroStage(1);
+              setHeroHeld(true);
+            }}
+            onFocus={() => {
+              setHeroStage(1);
+              setHeroHeld(true);
+            }}
+            onClick={() => w.navigate(`lab/${featured.id}`)}
+          >
+            <span>What can we try?</span>
+            <strong>
+              {featuredPermitted} allowed · {featuredBlocked} off the table
+            </strong>
+            <small>Rules run before any score</small>
+          </button>
+          <button
+            className={`hero-chip chip-value ${heroStage === 2 ? "active" : ""}`}
+            onMouseEnter={() => {
+              setHeroStage(2);
+              setHeroHeld(true);
+            }}
+            onFocus={() => {
+              setHeroStage(2);
+              setHeroHeld(true);
+            }}
+            onClick={() => w.navigate(`lab/${featured.id}`)}
+          >
+            <span>Best-value move</span>
+            <strong>{featuredSelected.label}</strong>
+            <small>
+              {featuredSelected.expectedValue === undefined
+                ? "No score needed for this call"
+                : `${formatINR(featuredSelected.expectedValue, 2)} after costs`}
+            </small>
+          </button>
+          <button
+            className={`hero-chip chip-outcome ${heroStage === 3 ? "active" : ""}`}
+            onMouseEnter={() => {
+              setHeroStage(3);
+              setHeroHeld(true);
+            }}
+            onFocus={() => {
+              setHeroStage(3);
+              setHeroHeld(true);
+            }}
+            onClick={() => w.navigate(`case/${featured.id}`)}
+          >
+            <span>Result</span>
+            <strong>
+              <Check size={13} /> Money recovered
+            </strong>
+            <small>Written to the record · {featured.id}</small>
+          </button>
+
+          <div className="hero-flow-glass">
+            <RecoveryFlow />
           </div>
-        );
-      }}
-    </QueryState>
+        </div>
+
+        <div className="hero-bottom">
+          <span>
+            <ShieldCheck size={13} />
+            Checked twice. Written down once. Nothing improvised.
+          </span>
+          <span className="hero-bottom-sim">
+            Simulation environment · No live payment rails
+          </span>
+        </div>
+      </section>
+
+      <section className="overview-metrics" aria-label="Financial summary">
+        <Metric
+          title="Money at risk"
+          value={m.atRisk}
+          icon={<ArrowUpRight size={14} />}
+          caption={`${w.cohort.length} failed debits in this view`}
+        />
+        <Metric
+          title="Yet to come back"
+          value={m.outstanding}
+          icon={<Layers2 size={14} />}
+          caption={`${m.active + m.escalations} cases still open`}
+        />
+        <Metric
+          title="Share recovered"
+          value={m.recoveryRate}
+          format={(n) => `${n.toFixed(1)}%`}
+          icon={<TrendingUp size={14} />}
+          caption="Weighted by rupees, not case count"
+          rate={m.recoveryRate}
+        />
+        <Metric
+          title="In play now"
+          value={m.active}
+          format={(n) => Math.round(n).toString().padStart(2, "0")}
+          icon={<Activity size={14} />}
+          caption={`${m.escalations} waiting on a person`}
+          onClick={() => w.navigate("cases?status=ACTIVE")}
+        />
+      </section>
+
+      <PhotoStories />
+
+      <div className="overview-analytics">
+        <RevenuePulse
+          input={w.cohort}
+          range={w.range}
+          setRange={w.setRange}
+          end={w.at}
+        />
+        <IntelligenceInsights />
+      </div>
+
+      <div className="overview-secondary-grid">
+        <section className="movement-section">
+          <SectionHeading
+            title="Where did the money go?"
+            description="Follow each rupee to the outcome it actually reached."
+            action={
+              <button
+                className="icon-button"
+                onClick={exportSnapshot}
+                aria-label="Export money movement snapshot"
+              >
+                <Download size={15} />
+              </button>
+            }
+          />
+          <MoneyMovement
+            input={w.cohort}
+            onBranch={(s) => w.navigate(`cases?status=${s}&range=${w.range}`)}
+          />
+        </section>
+        <ActivityFeed />
+      </div>
+
+      <section className="strategy-section">
+        <SectionHeading
+          title="REVIO vs. the old playbooks"
+          description="Same failed debits, four ways of handling them. REVIO doesn't always win—and it says so."
+          action={
+            <button
+              className="text-link"
+              onClick={() => w.navigate("outcomes")}
+            >
+              Full revenue analytics <ArrowRight size={13} />
+            </button>
+          }
+        />
+        <BaselineComparison rail={rail} setRail={setRail} />
+      </section>
+      <div className="overview-integrity-note">
+        <ShieldCheck size={14} />
+        <p>
+          The honesty bit: every customer and outcome here is synthetic. No
+          bank, PSP or production model is connected.{" "}
+          <button onClick={() => w.navigate("trust")}>
+            See what's simulated <ArrowUpRight size={11} />
+          </button>
+        </p>
+      </div>
+    </>
+  );
+}
+
+function Metric({
+  title,
+  value,
+  format,
+  icon,
+  caption,
+  rate,
+  onClick,
+}: {
+  title: string;
+  value: number;
+  format?: (n: number) => string;
+  icon: React.ReactNode;
+  caption: string;
+  rate?: number;
+  onClick?: () => void;
+}) {
+  return (
+    <div className="overview-metric">
+      <div className="metric-title">
+        {title}
+        <span>{icon}</span>
+      </div>
+      <div className="metric-value-row">
+        <NumberFlow value={value} format={format} />
+        {onClick && (
+          <button
+            className="metric-open"
+            onClick={onClick}
+            aria-label="View active recovery cases"
+          >
+            <ArrowUpRight size={15} />
+          </button>
+        )}
+      </div>
+      {rate !== undefined ? (
+        <div className="metric-progress">
+          <motion.i
+            animate={{ width: `${rate}%` }}
+            transition={{ duration: 0.45 }}
+          />
+        </div>
+      ) : null}
+      <span className="metric-caption">{caption}</span>
+    </div>
+  );
+}
+
+function IntelligenceInsights() {
+  const w = useWorkspace();
+  const m = getMetrics(w.cohort);
+  const technical = getMetrics(
+    w.cohort.filter((c) => c.failureCode === "BANK_TIMEOUT"),
+  );
+  const times = w.cohort
+    .filter((c) => c.status === "RECOVERED")
+    .sort(
+      (a, b) =>
+        new Date(a.recoveredAt!).getTime() - new Date(b.recoveredAt!).getTime(),
+    )
+    .map((c) => c.recoveryHours ?? 0);
+  const timingPath = times
+    .map(
+      (t, i) =>
+        `${i ? "L" : "M"}${2 + (i / Math.max(1, times.length - 1)) * 62} ${25 - (t / Math.max(1, ...times)) * 22}`,
+    )
+    .join(" ");
+  const activeValue = w.cohort
+    .filter((c) => c.status === "WAITING" || c.status === "ACTION PENDING")
+    .reduce((s, c) => s + c.amount, 0);
+  return (
+    <aside className="intelligence-insights">
+      <div className="intelligence-title">
+        <span className="intelligence-symbol">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+            <path
+              d="M3 13L8 8L11 11L17 4M11 4H17V10M3 4V17H17"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            />
+          </svg>
+        </span>
+        <h2>Worth a closer look</h2>
+        <Tooltip content="These are patterns in the synthetic cases you selected. They describe what happened; they don't prove why.">
+          <button aria-label="About these patterns">
+            <InfoIcon />
+          </button>
+        </Tooltip>
+      </div>
+      <div className="insight-lead">
+        <span className="eyebrow">From this batch of cases</span>
+        <p>
+          <strong>
+            {technical.atRisk
+              ? `${technical.recoveryRate.toFixed(1)}%`
+              : "No data"}
+          </strong>
+          {technical.atRisk
+            ? " of bank-timeout value was recovered in this cohort."
+            : " for bank-timeout cases in this range."}
+        </p>
+        <span>
+          A bank timeout is not an empty account. It shouldn't get the same
+          treatment.
+        </span>
+        <button onClick={() => w.navigate("outcomes")} className="text-link">
+          Open the breakdown <ArrowRight size={12} />
+        </button>
+      </div>
+      <div className="insight-mini-row">
+        <span className="insight-line-icon">
+          <Clock3 size={16} />
+        </span>
+        <div>
+          <strong>{m.avgHours.toFixed(1)} hours</strong>
+          <span>Typical time to get paid</span>
+        </div>
+        <svg
+          width="66"
+          height="27"
+          viewBox="0 0 66 27"
+          fill="none"
+          role="img"
+          aria-label="Recorded recovery durations in chronological order"
+        >
+          <path d={timingPath} stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      </div>
+      <button
+        className="insight-mini-row actionable"
+        onClick={() => w.navigate("cases?status=ACTIVE")}
+      >
+        <span className="insight-line-icon">
+          <ArrowDownLeft size={16} />
+        </span>
+        <div>
+          <strong>{formatINR(activeValue)} still waiting</strong>
+          <span>{m.active} cases—not finished, not written off</span>
+        </div>
+        <ArrowUpRight size={13} />
+      </button>
+      <div className="constraint-health">
+        <ShieldCheck size={16} />
+        <span>
+          <strong>{m.violations} rule breaches</strong>
+          <small>{m.prevented} moves stopped before scoring</small>
+        </span>
+        <CircleCheck size={13} />
+      </div>
+    </aside>
+  );
+}
+function InfoIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6" stroke="currentColor" />
+      <path d="M8 7V11M8 4.5V5" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function ActivityFeed() {
+  const w = useWorkspace();
+  const ids = new Set(w.cohort.map((c) => c.id));
+  const events = allJournalEntries
+    .filter((e) => ids.has(e.caseId) && new Date(e.at).getTime() <= w.at)
+    .slice(0, 5);
+  return (
+    <section className="activity-section">
+      <SectionHeading
+        title="Latest movement"
+        description="Newest first. Open any line to see the case behind it."
+        action={
+          <button className="text-link" onClick={() => w.navigate("audit")}>
+            View all <ArrowUpRight size={12} />
+          </button>
+        }
+      />
+      <div className="activity-feed">
+        <AnimatePresence initial={false}>
+          {events.map((e) => (
+            <motion.button
+              layout
+              key={e.id}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="feed-row"
+              onClick={() => w.navigate(`case/${e.caseId}`)}
+            >
+              <span
+                className={`feed-icon ${e.stage === "OUTCOME" ? "success" : ""}`}
+              >
+                {e.stage === "OUTCOME" ? (
+                  <Check size={13} />
+                ) : e.stage === "CONSTRAIN" ? (
+                  <ShieldCheck size={13} />
+                ) : (
+                  <Activity size={13} />
+                )}
+              </span>
+              <span>
+                <strong>
+                  {e.type === "payment.recovered"
+                    ? "Payment recovered"
+                    : e.type === "payment.failed"
+                      ? "Failure detected"
+                      : e.stage === "CONSTRAIN"
+                        ? "Constraints evaluated"
+                        : e.stage === "PREDICT"
+                          ? "Candidate estimates recorded"
+                          : e.stage === "OPTIMIZE"
+                            ? "Best permitted action selected"
+                            : e.stage === "EXECUTE"
+                              ? "Execution state recorded"
+                              : "Recovery state updated"}
+                </strong>
+                <small>
+                  {e.caseId} <i />
+                  {formatINR(e.amount)}
+                </small>
+              </span>
+              <time>
+                {timeOnly(e.at)}
+                <small>{dateOnly(e.at)}</small>
+              </time>
+            </motion.button>
+          ))}
+        </AnimatePresence>
+        {events.length === 0 && (
+          <p className="feed-empty">No recorded events in this cohort yet.</p>
+        )}
+      </div>
+      <div className="feed-caption">
+        <i />
+        {w.replay
+          ? "Replaying the synthetic event journal"
+          : "Synthetic event journal / not a live payment feed"}
+      </div>
+    </section>
   );
 }
