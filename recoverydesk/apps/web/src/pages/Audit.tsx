@@ -1,183 +1,327 @@
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
-import { api } from "../api/client";
-import { QueryState, EvidenceDrawer } from "../components/ui";
-
-const GROUPS = [
-  { key: "", label: "All Events" },
-  { key: "decision", label: "Decisions" },
-  { key: "intervention_executed", label: "Execution" },
-  { key: "attempt", label: "Attempts" },
-  { key: "case_", label: "State changes" },
-  { key: "notification", label: "Contact" },
-  { key: "blocked", label: "Refusals" },
-];
-
-function humanEvent(e: string): string {
-  if (e === "decision_made") return "Recovery option selected";
-  if (e === "candidate_blocked") return "Recovery option not available";
-  if (e === "intervention_proposed") return "Recovery option considered";
-  if (e === "intervention_executed") return "Recovery action dispatched";
-  if (e === "payment_failed") return "Payment failed";
-  if (e === "attempt_succeeded") return "Payment recovered";
-  if (e === "attempt_failed") return "Payment declined";
-  if (e === "case_opened") return "Case opened";
-  if (e === "case_recovered") return "Case recovered";
-  if (e === "case_stopped") return "Case stopped";
-  if (e === "case_escalated") return "Case escalated";
-  if (e === "notification_sent") return "Customer notified";
-  if (e === "customer_responded") return "Customer responded";
-  return e.replaceAll("_", " ");
-}
-
-function resultFor(e: any): { text: string; cls: string; color: string; glow: string } {
-  if (e.event_type.includes("recovered") || e.event_type.includes("succeeded")) return { text: "Recovered", cls: "good", color: "var(--good)", glow: '0 0 10px rgba(46, 139, 112, 0.4)' };
-  if (e.event_type.includes("blocked")) return { text: "Refused", cls: "bad", color: "var(--bad)", glow: '0 0 10px rgba(199, 91, 91, 0.4)' };
-  if (e.event_type.includes("failed")) return { text: "Failed", cls: "bad", color: "var(--bad)", glow: '0 0 10px rgba(199, 91, 91, 0.4)' };
-  if (e.event_type.includes("stopped")) return { text: "Stopped", cls: "", color: "var(--ink-2)", glow: 'none' };
-  if (e.event_type.includes("escalated")) return { text: "Escalated", cls: "warn", color: "var(--warn)", glow: 'none' };
-  if (e.event_type.includes("decision")) return { text: "Selected", cls: "info", color: "var(--money)", glow: 'none' };
-  if (e.event_type.includes("executed") || e.event_type.includes("notification")) return { text: "Dispatched", cls: "info", color: "var(--money)", glow: 'none' };
-  return { text: "Recorded", cls: "", color: "var(--ink-3)", glow: 'none' };
-}
-
-function actionFor(e: any): string {
-  switch (e.event_type) {
-    case "decision_made":
-    case "candidate_blocked":
-    case "intervention_executed":
-      return e.payload?.candidate_id || e.payload?.action_type || "—";
-    case "attempt_succeeded":
-    case "attempt_failed":
-    case "payment_failed":
-      return e.payload?.window_code ? `Window ${e.payload.window_code}` : "—";
-    case "notification_sent":
-      return e.payload?.channel ? `${e.payload.channel} reminder` : "—";
-    default:
-      return "—";
-  }
-}
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowUpRight,
+  Check,
+  ChevronDown,
+  Download,
+  Search,
+  ShieldCheck,
+  Terminal,
+} from "lucide-react";
+import { EmptyState, PageHeading } from "../components/ui";
+import { allJournalEntries, cases, formatTime } from "../data/simulation";
+import { exportFile, timeOnly, dateOnly } from "../data/workspace";
+import { useWorkspace } from "../state/Workspace";
+import { runDiagnostics } from "../data/diagnostics";
 
 export default function Audit() {
-  const [g, setG] = useState("");
-  const [q, setQ] = useState("");
-  const events = useQuery({
-    queryKey: ["events", "audit"],
-    queryFn: () => api("/api/events?limit=200" as "/api/events"),
-    refetchInterval: 5_000,
-  });
-
-  const matchGroup = (group: string, eventType: string) => {
-    if (!group) return true;
-    return eventType.includes(group);
-  };
-
-  const rows = useMemo(() => {
-    const items = events.data?.items ?? [];
-    const f = q.toLowerCase();
-    return items.filter((e) =>
-      matchGroup(g, e.event_type) &&
-      (!f || e.event_type.toLowerCase().includes(f) || e.case_id.toLowerCase().includes(f)));
-  }, [events.data, g, q]);
-
+  const w = useWorkspace();
+  const [query, setQuery] = useState("");
+  const [stage, setStage] = useState("ALL");
+  const [caseId, setCaseId] = useState("ALL");
+  const [order, setOrder] = useState("newest");
+  const [limit, setLimit] = useState(15);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [verified, setVerified] = useState<boolean | null>(null);
+  const filtered = useMemo(
+    () =>
+      allJournalEntries
+        .filter(
+          (e) =>
+            (stage === "ALL" || e.stage === stage) &&
+            (caseId === "ALL" || e.caseId === caseId) &&
+            (!query.trim() ||
+              `${e.id} ${e.caseId} ${e.type} ${e.actor} ${e.summary} ${Object.values(e.refs).join(" ")}`
+                .toLowerCase()
+                .includes(query.toLowerCase())),
+        )
+        .sort(
+          (a, b) =>
+            (new Date(a.at).getTime() - new Date(b.at).getTime()) *
+            (order === "newest" ? -1 : 1),
+        ),
+    [query, stage, caseId, order],
+  );
+  useEffect(() => {
+    setLimit(15);
+    setExpanded(null);
+  }, [query, stage, caseId, order]);
   return (
-    <div className="page-with-hero">
-      <div className="page-hero-bg hero-audit" />
-      <div className="page-header" style={{ marginBottom: 48 }}>
-        <h1 style={{ fontSize: 32, marginBottom: 12 }}>Audit Journal</h1>
-        <p style={{ color: 'var(--ink-2)', fontSize: 15 }}>A strictly ordered, immutable timeline of every system action recorded with verifiable logic traces.</p>
+    <>
+      <PageHeading
+        title="Audit trail"
+        description="The evidence is part of the product. Every step has a record."
+        actions={
+          <>
+            <button
+              className="btn"
+              onClick={() => {
+                const check = runDiagnostics().find(
+                  (d) => d.label === "Unique, chronological evidence",
+                );
+                setVerified(check?.passed ?? false);
+              }}
+            >
+              <ShieldCheck size={13} />
+              Check integrity
+            </button>
+            <button
+              className="btn primary"
+              onClick={() => {
+                exportFile("revio-synthetic-audit.json", filtered);
+                w.notify(
+                  `${filtered.length} filtered journal records exported.`,
+                );
+              }}
+            >
+              <Download size={13} />
+              Export journal
+            </button>
+          </>
+        }
+      />
+      <div className="audit-summary">
+        <span className="audit-summary-icon">
+          <Terminal size={24} />
+        </span>
+        <div>
+          <h2>An append-only story.</h2>
+          <p>
+            Recorded synthetic evidence, from the first failure to the final
+            outcome.
+          </p>
+        </div>
+        <span>
+          <strong>{allJournalEntries.length}</strong>journal entries
+        </span>
+        <span>
+          <strong>{cases.length}</strong>case records
+        </span>
+        <span className="audit-readonly">
+          <LockIcon />
+          Read-only ledger
+        </span>
       </div>
-      
-      <div style={{ display: 'flex', gap: 16, borderBottom: '1px solid var(--line)', paddingBottom: 24, marginBottom: 24, alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          {GROUPS.map((x) => (
-            <button key={x.key} className="btn" style={{ 
-              background: g === x.key ? 'rgba(232, 183, 92, 0.1)' : 'transparent', 
-              color: g === x.key ? 'var(--money)' : 'var(--ink-2)', 
-              border: g === x.key ? '1px solid var(--money)' : '1px solid var(--line)',
-              fontWeight: 500
-            }}
-              onClick={() => setG(x.key)}>{x.label}</button>
+      <AnimatePresence>
+        {verified !== null && (
+          <motion.div
+            className={`integrity-result ${verified ? "pass" : "fail"}`}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <ShieldCheck size={17} />
+            <span>
+              <strong>
+                {verified
+                  ? "Local structural checks passed."
+                  : "A structural inconsistency was found."}
+              </strong>{" "}
+              Unique journal IDs and chronology were checked in memory. This is
+              not cryptographic verification or backend attestation.
+            </span>
+            <button className="text-link" onClick={() => w.navigate("trust")}>
+              All diagnostics <ArrowUpRight size={12} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="audit-filters">
+        <label className="search-field">
+          <Search size={14} />
+          <input
+            className="field"
+            aria-label="Search audit evidence"
+            placeholder="Search events, references, actors or evidence..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+        <select
+          className="field"
+          aria-label="Audit stage filter"
+          value={stage}
+          onChange={(e) => setStage(e.target.value)}
+        >
+          <option value="ALL">All stages</option>
+          {[
+            "DETECT",
+            "CONSTRAIN",
+            "PREDICT",
+            "OPTIMIZE",
+            "EXECUTE",
+            "AUDIT",
+            "OUTCOME",
+          ].map((s) => (
+            <option key={s}>{s}</option>
           ))}
-        </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', background: 'var(--bg-1)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '0 16px' }}>
-          <span style={{ color: 'var(--ink-3)' }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </span>
-          <input className="input" style={{ width: 280, border: 'none', background: 'transparent', boxShadow: 'none' }} placeholder="Search the journal by event or case ID..." value={q}
-            onChange={(e) => setQ(e.target.value)} />
-        </div>
+        </select>
+        <select
+          className="field"
+          aria-label="Audit case filter"
+          value={caseId}
+          onChange={(e) => setCaseId(e.target.value)}
+        >
+          <option value="ALL">All case references</option>
+          {cases.map((c) => (
+            <option key={c.id}>{c.id}</option>
+          ))}
+        </select>
+        <select
+          className="field"
+          aria-label="Audit chronological order"
+          value={order}
+          onChange={(e) => setOrder(e.target.value)}
+        >
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
       </div>
-
-        <QueryState q={events} empty={(x) => x.items.length === 0}>
-          {() => (
-            rows.length === 0 ? (
-              <div className="state-empty" style={{ paddingTop: 80, paddingBottom: 80, background: 'var(--bg-1)', border: '1px solid var(--line)', borderRadius: 'var(--radius)' }}>
-                No events found matching this criteria.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {rows.map((e) => {
-                  const r = resultFor(e);
-                  const isRed = r.text === "Refused" || r.text === "Failed";
-                  const isGreen = r.text === "Recovered";
-                  
-                  return (
-                    <div key={e.event_id} style={{ display: 'grid', gridTemplateColumns: '180px 1fr max-content', gap: 24, padding: '24px', border: '1px solid var(--line)', borderRadius: 'var(--radius)', background: 'var(--bg-1)', position: 'relative', overflow: 'hidden' }} className="hover-bg-0">
-                      
-                      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: r.color, opacity: 0.6 }} />
-
-                      <div className="text-ink-3" style={{ fontSize: 13, fontWeight: 500, paddingLeft: 12 }}>
-                        {new Date(e.occurred_at).toLocaleString("en-US", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: true })}
-                      </div>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
-                        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                          <div style={{ fontWeight: 600, color: 'var(--ink-1)', fontSize: 16 }}>
-                            {humanEvent(e.event_type)}
-                          </div>
-                        </div>
-                        <div className="text-ink-2" style={{ fontSize: 14, lineHeight: 1.5 }}>
-                          {actionFor(e) !== "—" ? `${actionFor(e).replaceAll("_", " ")} was recorded.` : "System state advanced."}
-                        </div>
-                        <div style={{ marginTop: 8 }}>
-                          <Link to={`/cases/${e.case_id}`} className="mono text-info hover-underline" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
-                            Case {e.case_id}
-                          </Link>
-                        </div>
-
-                        {/* Evidence Drawer */}
-                        <div style={{ marginTop: 16 }}>
-                          <EvidenceDrawer 
-                            title="VIEW TECHNICAL EVIDENCE"
-                            record={{
-                              "Event ID": e.event_id,
-                              "Type": e.event_type,
-                              "Occurred": e.occurred_at,
-                              "Target Case": e.case_id
-                            }}
-                            payload={e.payload}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <span style={{ padding: '6px 12px', fontSize: 12, fontWeight: 600, borderRadius: 20, border: `1px solid ${isRed ? 'rgba(199, 91, 91, 0.2)' : (isGreen ? 'rgba(46, 139, 112, 0.2)' : 'var(--line)')}`, color: isRed ? 'var(--bad)' : (isGreen ? 'var(--good)' : 'var(--ink-2)'), background: isRed ? 'rgba(199, 91, 91, 0.05)' : (isGreen ? 'rgba(46, 139, 112, 0.05)' : 'transparent'), letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                          {r.text}
+      <div className="audit-match-count">
+        <span>{filtered.length} matching records</span>
+        <span>Asia/Kolkata / synthetic journal</span>
+      </div>
+      <section className="audit-ledger">
+        <div className="audit-table-head">
+          <span>Recorded at</span>
+          <span>Event / action</span>
+          <span>Case reference</span>
+          <span>Result / compliance</span>
+          <span />
+        </div>
+        {filtered.length ? (
+          filtered.slice(0, limit).map((e) => (
+            <div
+              className={`audit-ledger-entry ${expanded === e.id ? "expanded" : ""}`}
+              key={e.id}
+            >
+              <button
+                className="audit-ledger-row"
+                onClick={() => setExpanded(expanded === e.id ? null : e.id)}
+                aria-expanded={expanded === e.id}
+              >
+                <time>
+                  <strong>{timeOnly(e.at)}</strong>
+                  <span>{dateOnly(e.at)} 2026</span>
+                </time>
+                <span className="audit-event">
+                  <span
+                    className={`audit-event-icon ${e.stage === "OUTCOME" ? "success" : ""}`}
+                  >
+                    {e.stage === "OUTCOME" ? (
+                      <Check size={12} />
+                    ) : (
+                      <Terminal size={12} />
+                    )}
+                  </span>
+                  <span>
+                    <strong>{e.type}</strong>
+                    <small>
+                      {String(
+                        e.refs.selected_action ?? e.refs.dispatch ?? e.actor,
+                      ).replace(/_/g, " ")}
+                    </small>
+                  </span>
+                </span>
+                <span className="mono audit-case-ref">{e.caseId}</span>
+                <span className="audit-event-result">
+                  <strong>
+                    {e.stage === "CONSTRAIN"
+                      ? "Constraints evaluated"
+                      : e.stage === "OUTCOME"
+                        ? "Recovery confirmed"
+                        : e.stage === "PREDICT"
+                          ? "Eligible candidates only"
+                          : e.stage === "EXECUTE"
+                            ? String(
+                                e.refs.gateway_check ?? "Recorded",
+                              ).replace(/_/g, " ")
+                            : "Evidence recorded"}
+                  </strong>
+                  <small>{e.stage.toLowerCase()} / synthetic</small>
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={expanded === e.id ? "rotated" : ""}
+                />
+              </button>
+              <AnimatePresence initial={false}>
+                {expanded === e.id && (
+                  <motion.div
+                    className="audit-expanded"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.24 }}
+                  >
+                    <div>
+                      <section>
+                        <span className="eyebrow blue">
+                          The recorded explanation
                         </span>
-                      </div>
+                        <p>{e.summary}</p>
+                        <span className="mono">{e.id}</span>
+                        <small>
+                          {formatTime(e.at)} / {e.actor}
+                        </small>
+                        <button
+                          className="text-link"
+                          onClick={() => w.navigate(`case/${e.caseId}`)}
+                        >
+                          Open full investigation <ArrowUpRight size={12} />
+                        </button>
+                      </section>
+                      <dl className="evidence-fields">
+                        {Object.entries(e.refs).map(([key, value]) => (
+                          <div key={key}>
+                            <dt>{key.replace(/_/g, " ")}</dt>
+                            <dd>{String(value)}</dd>
+                          </div>
+                        ))}
+                      </dl>
                     </div>
-                  );
-                })}
-              </div>
-            )
-          )}
-        </QueryState>
-
-    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))
+        ) : (
+          <EmptyState
+            body="No journal entry matches the current search and filters."
+            action={
+              <button
+                className="btn"
+                onClick={() => {
+                  setQuery("");
+                  setStage("ALL");
+                  setCaseId("ALL");
+                }}
+              >
+                Clear filters
+              </button>
+            }
+          />
+        )}
+      </section>
+      {limit < filtered.length && (
+        <div className="audit-load-more">
+          <button className="btn" onClick={() => setLimit((l) => l + 15)}>
+            Load {Math.min(15, filtered.length - limit)} more records{" "}
+            <ChevronDown size={13} />
+          </button>
+          <span>
+            {Math.min(limit, filtered.length)} / {filtered.length} records shown
+          </span>
+        </div>
+      )}
+    </>
+  );
+}
+function LockIcon() {
+  return (
+    <svg width="13" height="14" viewBox="0 0 14 16" fill="none">
+      <rect x="2" y="7" width="10" height="8" rx="2" stroke="currentColor" />
+      <path d="M4 7V4C4 0 10 0 10 4V7M7 10V12" stroke="currentColor" />
+    </svg>
   );
 }

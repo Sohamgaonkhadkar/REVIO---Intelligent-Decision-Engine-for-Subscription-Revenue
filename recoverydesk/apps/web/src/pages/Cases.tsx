@@ -1,175 +1,728 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { api } from "../api/client";
-import { QueryState, StateChip, inr, classHuman, railHuman, ago } from "../components/ui";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Bookmark,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Download,
+  ListFilter,
+  Rows3,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  X,
+} from "lucide-react";
+import { DateRangeControl } from "../components/ConsoleShell";
+import {
+  Budget,
+  EmptyState,
+  Modal,
+  PageHeading,
+  StatusMark,
+  Tooltip,
+} from "../components/ui";
+import {
+  cases,
+  failureMeta,
+  formatINR,
+  formatTime,
+  type RecoveryCase,
+} from "../data/simulation";
+import {
+  ageLabel,
+  exportFile,
+  filterRange,
+  safeRead,
+  safeWrite,
+  type TimeRange,
+} from "../data/workspace";
+import { useWorkspace } from "../state/Workspace";
 
-function BudgetBlocks({ used, max }: { used: number, max: number }) {
+interface Filters {
+  search: string;
+  status: string;
+  rail: string;
+  failure: string;
+  sort: string;
+}
+interface Preset {
+  name: string;
+  filters: Filters;
+}
+const defaults: Filters = {
+  search: "",
+  status: "ALL",
+  rail: "ALL",
+  failure: "ALL",
+  sort: "newest",
+};
+const statuses = [
+  { value: "ALL", label: "All cases" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "RECOVERED", label: "Recovered" },
+  { value: "ESCALATED", label: "Escalated" },
+  { value: "STOPPED", label: "Stopped" },
+];
+
+export default function Cases() {
+  const w = useWorkspace();
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...defaults,
+    ...safeRead("revio-blue-queue", {}),
+  }));
+  const [density, setDensity] = useState<"comfortable" | "compact">(() =>
+    safeRead("revio-blue-density", "comfortable"),
+  );
+  const [page, setPage] = useState(() => safeRead("revio-blue-queue-page", 1));
+  const [selected, setSelected] = useState<RecoveryCase | null>(null);
+  const [presetOpen, setPresetOpen] = useState(false);
+  const [presetName, setPresetName] = useState("");
+  const [presets, setPresets] = useState<Preset[]>(() =>
+    safeRead("revio-blue-presets", []),
+  );
+  const [mobileFilters, setMobileFilters] = useState(false);
+  const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  useEffect(() => {
+    const q = new URLSearchParams(w.route.split("?")[1] ?? "");
+    const status = q.get("status");
+    const range = q.get("range");
+    const rail = q.get("rail");
+    const failure = q.get("failure");
+    if (status || rail || failure) {
+      setFilters({
+        ...defaults,
+        status: status ?? "ALL",
+        rail: rail && ["UPI AutoPay", "Card SI"].includes(rail) ? rail : "ALL",
+        failure: failure && failure in failureMeta ? failure : "ALL",
+      });
+      setPage(1);
+    }
+    if (range && ["24H", "7D", "30D", "ALL"].includes(range))
+      w.setRange(range as TimeRange);
+  }, [w.route]);
+  useEffect(() => {
+    safeWrite("revio-blue-queue", filters);
+  }, [filters]);
+  useEffect(() => {
+    safeWrite("revio-blue-density", density);
+  }, [density]);
+  useEffect(() => {
+    safeWrite("revio-blue-queue-page", page);
+  }, [page]);
+  useEffect(() => {
+    safeWrite("revio-blue-presets", presets);
+  }, [presets]);
+  const source = useMemo(() => filterRange(cases, w.range), [w.range]);
+  const filtered = useMemo(
+    () =>
+      source
+        .filter((c) => {
+          const q = filters.search.trim().toLowerCase();
+          return (
+            (!q ||
+              [c.id, c.customerRef, c.failureReason, c.subscription].some((s) =>
+                s.toLowerCase().includes(q),
+              )) &&
+            (filters.status === "ALL" ||
+              (filters.status === "ACTIVE" &&
+                ["ACTION PENDING", "WAITING"].includes(c.status)) ||
+              c.status === filters.status) &&
+            (filters.rail === "ALL" || c.rail === filters.rail) &&
+            (filters.failure === "ALL" || c.failureCode === filters.failure)
+          );
+        })
+        .sort((a, b) =>
+          filters.sort === "value-desc"
+            ? b.amount - a.amount
+            : filters.sort === "value-asc"
+              ? a.amount - b.amount
+              : filters.sort === "oldest"
+                ? new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+                : new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime(),
+        ),
+    [source, filters],
+  );
+  const perPage = density === "compact" ? 12 : 8;
+  const pages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const current = Math.min(page, pages);
+  const visible = filtered.slice((current - 1) * perPage, current * perPage);
+  const update = (key: keyof Filters, value: string) => {
+    setFilters((f) => ({ ...f, [key]: value }));
+    setPage(1);
+  };
+  const clear = () => {
+    setFilters(defaults);
+    setPage(1);
+  };
+  const activeFilters =
+    Number(filters.rail !== "ALL") +
+    Number(filters.failure !== "ALL") +
+    Number(!!filters.search) +
+    Number(filters.status !== "ALL");
+  const csv = () => {
+    const header = [
+      "environment",
+      "case_id",
+      "amount_inr",
+      "status",
+      "failure_reason",
+      "rail",
+      "selected_action",
+      "retry_budget_remaining",
+      "contact_budget_remaining",
+      "created_at",
+    ];
+    const rows = filtered.map((c) => [
+      "SYNTHETIC SIMULATION",
+      c.id,
+      c.amount,
+      c.status,
+      c.failureReason,
+      c.rail,
+      c.selectedAction,
+      3 - c.constraints.retriesUsed,
+      2 - c.constraints.contactsUsed,
+      c.createdAt,
+    ]);
+    exportFile(
+      "revio-filtered-synthetic-cases.csv",
+      [header, ...rows]
+        .map((r) =>
+          r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","),
+        )
+        .join("\n"),
+      true,
+    );
+    w.notify(`${filtered.length} filtered synthetic cases exported to CSV.`);
+  };
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
-      {Array.from({ length: max }).map((_, i) => (
-        <div key={i} style={{ 
-          width: 8, 
-          height: 12, 
-          background: i < used ? 'var(--ink-2)' : 'rgba(148, 163, 184, 0.15)'
-        }} />
-      ))}
-    </div>
+    <>
+      <PageHeading
+        title="Recovery cases"
+        description="Work the queue by money at stake, what's still allowed, and what cannot wait."
+        actions={
+          <>
+            <DateRangeControl />
+            <button
+              className="btn primary"
+              onClick={csv}
+              disabled={!filtered.length}
+            >
+              <Download size={13} />
+              Export cases
+            </button>
+          </>
+        }
+      />
+      <div className="queue-summary">
+        <span>
+          <strong>{source.length}</strong> cases in the selected cohort
+        </span>
+        <span>
+          <i className="blue-dot" />
+          {
+            source.filter((c) =>
+              ["ACTION PENDING", "WAITING"].includes(c.status),
+            ).length
+          }{" "}
+          active
+        </span>
+        <span>
+          <i className="green-dot" />
+          {source.filter((c) => c.status === "RECOVERED").length} recovered
+        </span>
+        <span>
+          <i className="amber-dot" />
+          {source.filter((c) => c.status === "ESCALATED").length} escalated
+        </span>
+        <span className="queue-risk-total">
+          {formatINR(source.reduce((s, c) => s + c.amount, 0))}
+          <small>original value at risk</small>
+        </span>
+      </div>
+      <section className="case-workstation" data-tour="cases">
+        <div
+          className="queue-status-tabs"
+          role="group"
+          aria-label="Case status filter"
+        >
+          {statuses.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => update("status", s.value)}
+              className={filters.status === s.value ? "active" : ""}
+            >
+              {s.label}
+              <span>
+                {
+                  source.filter(
+                    (c) =>
+                      s.value === "ALL" ||
+                      (s.value === "ACTIVE" &&
+                        ["ACTION PENDING", "WAITING"].includes(c.status)) ||
+                      s.value === c.status,
+                  ).length
+                }
+              </span>
+            </button>
+          ))}
+          <button
+            className="saved-views-trigger"
+            onClick={() => setPresetOpen(true)}
+          >
+            <Bookmark size={13} />
+            Saved views{presets.length > 0 && <small>{presets.length}</small>}
+          </button>
+        </div>
+        <div className="queue-toolbar">
+          <label className="search-field">
+            <Search size={14} />
+            <input
+              className="field"
+              aria-label="Search recovery cases"
+              placeholder="Search case ID, customer or failure..."
+              value={filters.search}
+              onChange={(e) => update("search", e.target.value)}
+            />
+          </label>
+          <button
+            className="btn mobile-filter-trigger"
+            onClick={() => setMobileFilters(!mobileFilters)}
+          >
+            <SlidersHorizontal size={14} />
+            Filters
+          </button>
+          <div className={`queue-filters ${mobileFilters ? "expanded" : ""}`}>
+            <select
+              className="field"
+              aria-label="Filter payment rail"
+              value={filters.rail}
+              onChange={(e) => update("rail", e.target.value)}
+            >
+              <option value="ALL">All payment rails</option>
+              <option>UPI AutoPay</option>
+              <option>Card SI</option>
+            </select>
+            <select
+              className="field"
+              aria-label="Filter failure type"
+              value={filters.failure}
+              onChange={(e) => update("failure", e.target.value)}
+            >
+              <option value="ALL">All failure types</option>
+              {Object.entries(failureMeta).map(([id, meta]) => (
+                <option key={id} value={id}>
+                  {meta.short}
+                </option>
+              ))}
+            </select>
+            <select
+              className="field"
+              aria-label="Sort recovery cases"
+              value={filters.sort}
+              onChange={(e) => update("sort", e.target.value)}
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="value-desc">Highest value</option>
+              <option value="value-asc">Lowest value</option>
+            </select>
+          </div>
+          <Tooltip
+            content={`Switch to ${density === "comfortable" ? "compact" : "comfortable"} rows`}
+          >
+            <button
+              className={`icon-button density-button ${density === "compact" ? "active" : ""}`}
+              aria-label={`Switch to ${density === "comfortable" ? "compact" : "comfortable"} density`}
+              onClick={() => {
+                setDensity(
+                  density === "comfortable" ? "compact" : "comfortable",
+                );
+                setPage(1);
+              }}
+            >
+              <Rows3 size={17} />
+            </button>
+          </Tooltip>
+        </div>
+        {activeFilters > 0 && (
+          <div className="active-filter-line">
+            <ListFilter size={12} />
+            <span>
+              {activeFilters} active filters / {filtered.length} matching cases
+            </span>
+            <button onClick={clear}>
+              Clear all <X size={11} />
+            </button>
+          </div>
+        )}
+        <div className={`case-table ${density}`}>
+          <div className="case-table-header">
+            <span>Amount at risk</span>
+            <span>Case / failure reason</span>
+            <span>Status</span>
+            <span>Payment rail</span>
+            <span>Budgets left</span>
+            <span>Next move</span>
+            <span />
+          </div>
+          {visible.length ? (
+            visible.map((c, i) => (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2, delay: i * 0.015 }}
+                className={`case-row ${selected?.id === c.id ? "selected" : ""}`}
+                key={c.id}
+                ref={(el) => {
+                  rowRefs.current[i] = el;
+                }}
+                onClick={() => setSelected(c)}
+                aria-label={`Inspect ${c.id}, ${formatINR(c.amount)}, ${c.status.toLowerCase()}`}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    rowRefs.current[
+                      Math.max(
+                        0,
+                        Math.min(
+                          visible.length - 1,
+                          i + (e.key === "ArrowDown" ? 1 : -1),
+                        ),
+                      )
+                    ]?.focus();
+                  }
+                }}
+              >
+                <span className="case-amount financial">
+                  {formatINR(c.amount)}
+                  <small>{ageLabel(c.createdAt)}</small>
+                </span>
+                <span className="case-description">
+                  <strong>{failureMeta[c.failureCode].short}</strong>
+                  <span className="mono">{c.id}</span>
+                </span>
+                <StatusMark status={c.status} />
+                <span className="case-rail">
+                  <span
+                    className={`rail-mark ${c.rail === "Card SI" ? "card" : ""}`}
+                  >
+                    {c.rail === "Card SI" ? <span /> : <i />}
+                  </span>
+                  {c.rail === "Card SI" ? "Card SI" : "UPI AutoPay"}
+                </span>
+                <span className="case-budget-numbers">
+                  <span>
+                    <strong>{3 - c.constraints.retriesUsed}</strong>
+                    <small>/ 3 retries</small>
+                  </span>
+                  <span>
+                    <strong>{2 - c.constraints.contactsUsed}</strong>
+                    <small>/ 2 contacts</small>
+                  </span>
+                </span>
+                <span className="case-action">
+                  {c.strategy}
+                  {c.nextActionAt && (
+                    <small>
+                      {formatTime(c.nextActionAt).split(", ")[1] ?? "Scheduled"}
+                    </small>
+                  )}
+                </span>
+                <ArrowUpRight size={14} className="case-row-arrow" />
+              </motion.button>
+            ))
+          ) : (
+            <EmptyState
+              body="No synthetic cases match this combination. Broaden the search or clear your filters."
+              action={
+                <button className="btn" onClick={clear}>
+                  Clear filters
+                </button>
+              }
+            />
+          )}
+        </div>
+        <div className="queue-pagination">
+          <span>
+            {filtered.length
+              ? `${(current - 1) * perPage + 1}-${Math.min(current * perPage, filtered.length)}`
+              : "0"}{" "}
+            of {filtered.length} cases <i />
+            {formatINR(filtered.reduce((s, c) => s + c.amount, 0))} in view
+          </span>
+          <div>
+            <button
+              className="icon-button"
+              onClick={() => setPage(current - 1)}
+              disabled={current === 1}
+              aria-label="Previous cases page"
+            >
+              <ChevronLeft size={15} />
+            </button>
+            {Array.from({ length: pages }, (_, i) => (
+              <button
+                key={i}
+                className={`page-number ${current === i + 1 ? "active" : ""}`}
+                onClick={() => setPage(i + 1)}
+                aria-label={`Cases page ${i + 1}`}
+                aria-current={current === i + 1 ? "page" : undefined}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              className="icon-button"
+              onClick={() => setPage(current + 1)}
+              disabled={current === pages}
+              aria-label="Next cases page"
+            >
+              <ChevronRight size={15} />
+            </button>
+          </div>
+        </div>
+      </section>
+      <div className="queue-keyboard-note">
+        <span>
+          <kbd>↑</kbd>
+          <kbd>↓</kbd>Navigate visible rows <kbd>enter</kbd>Inspect case
+        </span>
+        <span>Synthetic payment records. No production customers.</span>
+      </div>
+      <AnimatePresence>
+        {selected && (
+          <CaseDrawer c={selected} onClose={() => setSelected(null)} />
+        )}
+        {presetOpen && (
+          <Modal
+            className="preset-modal"
+            title="Saved case filter views"
+            onClose={() => setPresetOpen(false)}
+          >
+            <div className="modal-heading">
+              <h2>Save this setup.</h2>
+              <button
+                className="icon-button"
+                onClick={() => setPresetOpen(false)}
+                aria-label="Close saved views"
+              >
+                <X size={17} />
+              </button>
+            </div>
+            <p>
+              Save the current search, status, rail, failure and sort. Views
+              stay in this browser.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const name = presetName.trim();
+                if (!name) return;
+                setPresets((p) => [
+                  ...p.filter((x) => x.name !== name),
+                  { name, filters },
+                ]);
+                setPresetName("");
+                w.notify(`Saved filter view: ${name}`);
+              }}
+            >
+              <input
+                className="field"
+                placeholder="Name this filter view"
+                aria-label="Saved filter name"
+                maxLength={40}
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+              />
+              <button className="btn primary" disabled={!presetName.trim()}>
+                <Bookmark size={13} />
+                Save view
+              </button>
+            </form>
+            <div className="saved-view-list">
+              {presets.length ? (
+                presets.map((p) => (
+                  <div key={p.name}>
+                    <button
+                      onClick={() => {
+                        setFilters(p.filters);
+                        setPage(1);
+                        setPresetOpen(false);
+                        w.notify(`Applied saved view: ${p.name}`);
+                      }}
+                    >
+                      <Bookmark size={14} />
+                      <span>
+                        {p.name}
+                        <small>
+                          {p.filters.status === "ALL"
+                            ? "All statuses"
+                            : p.filters.status.toLowerCase()}{" "}
+                          /{" "}
+                          {p.filters.rail === "ALL"
+                            ? "All rails"
+                            : p.filters.rail}
+                        </small>
+                      </span>
+                      <ArrowRight size={14} />
+                    </button>
+                    <button
+                      className="icon-button"
+                      onClick={() =>
+                        setPresets((list) =>
+                          list.filter((x) => x.name !== p.name),
+                        )
+                      }
+                      aria-label={`Delete saved view ${p.name}`}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="saved-view-empty">
+                  No saved views yet. Save this filter combination to start.
+                </div>
+              )}
+            </div>
+          </Modal>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
-const STATES = ["", "OPEN_DECISION", "ACTION_PENDING", "AWAITING_CUSTOMER", "WAITING", "ESCALATED", "RECOVERED", "STOPPED"];
-const RAILS = ["", "upi_autopay", "card_si"];
-const FAILURE_CLASSES = ["", "INSUFFICIENT_FUNDS", "BANK_TECHNICAL", "MANDATE_CLOSED", "RATE_LIMIT", "MANDATE_PAUSED"];
-
-export default function Cases() {
-  const nav = useNavigate();
-  const [state, setState] = useState("");
-  const [rail, setRail] = useState("");
-  const [failureClass, setFailureClass] = useState("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(0);
-  const limit = 25;
-
-  const query = useQuery({
-    queryKey: ["cases", state, rail, failureClass, page, q],
-    queryFn: async () => {
-      const p = new URLSearchParams({ limit: String(limit), offset: String(page * limit) });
-      if (state) p.set("state", state);
-      if (rail) p.set("rail", rail);
-      if (failureClass) p.set("failure_class", failureClass);
-      if (q) p.set("q", q);
-      return api(`/api/cases?${p.toString()}` as "/api/cases");
-    },
-    refetchInterval: 5_000,
-  });
-
-  const hasFilters = state !== "" || rail !== "" || failureClass !== "" || q !== "";
-  const cases = query.data?.items ?? [];
-
+export function CaseDrawer({
+  c,
+  onClose,
+}: {
+  c: RecoveryCase;
+  onClose: () => void;
+}) {
+  const w = useWorkspace();
+  const chosen = c.candidates.find((a) => a.selected)!;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(c.id);
+      w.notify("Case ID copied.");
+    } catch {
+      w.notify(c.id);
+    }
+  };
+  const open = (route: string) => {
+    onClose();
+    w.navigate(route);
+  };
   return (
-    <div className="page-with-hero">
-      <div className="page-hero-bg hero-cases" />
-      <div className="page-header">
-        <div className="eyebrow" style={{ marginBottom: 12, color: 'var(--ink-3)' }}>Working queue</div>
-        <h1 style={{ fontSize: 32, marginBottom: 12 }}>Recovery cases</h1>
-        <p style={{ color: 'var(--ink-2)', fontSize: 15 }}>Prioritized queue of failed recurring payments. Organized by money at risk and time elapsed.</p>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {/* OPERATIONAL FILTERING BAR */}
-        <div className="card" style={{ padding: '16px 24px', display: "flex", gap: 16, alignItems: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
-          <input className="input" style={{ flexGrow: 1, minWidth: 280 }} placeholder="Search by customer, reference, bank or reason..."
-            value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }} />
-            
-          <select className="input" style={{ width: 180 }} value={state} onChange={(e) => { setState(e.target.value); setPage(0); }}>
-            <option value="">All states</option>
-            {STATES.filter(s => s).map((s) => <option key={s} value={s}>{s.replaceAll("_", " ")}</option>)}
-          </select>
-          
-          <select className="input" style={{ width: 180 }} value={failureClass} onChange={(e) => { setFailureClass(e.target.value); setPage(0); }}>
-            <option value="">All reasons</option>
-            {FAILURE_CLASSES.filter(s => s).map((s) => <option key={s} value={s}>{classHuman(s)}</option>)}
-          </select>
-          
-          <select className="input" style={{ width: 140 }} value={rail} onChange={(e) => { setRail(e.target.value); setPage(0); }}>
-            <option value="">All rails</option>
-            {RAILS.filter(r => r).map((s) => <option key={s} value={s}>{railHuman(s)}</option>)}
-          </select>
-          
-          {hasFilters && (
-            <button className="btn" style={{ minWidth: 80 }} onClick={() => { setQ(""); setState(""); setFailureClass(""); setRail(""); setPage(0); }}>Clear filters</button>
-          )}
+    <Modal
+      className="case-drawer drawer"
+      title={`Quick inspection of ${c.id}`}
+      onClose={onClose}
+    >
+      <header className="drawer-heading">
+        <span>
+          <span className="eyebrow blue">Recovery case</span>
+          <strong className="mono">{c.id}</strong>
+        </span>
+        <button
+          className="icon-button"
+          onClick={copy}
+          aria-label="Copy case ID"
+        >
+          <Copy size={15} />
+        </button>
+        <button
+          className="icon-button"
+          onClick={onClose}
+          aria-label="Close case drawer"
+        >
+          <X size={18} />
+        </button>
+      </header>
+      <div className="drawer-content">
+        <div className="drawer-status">
+          <StatusMark status={c.status} />
+          <span>Synthetic case</span>
         </div>
-        
-        <div className="flex-between" style={{ paddingBottom: 16 }}>
-          <div className="eyebrow text-info">
-            {cases.length > 0 ? `Showing ${page * limit + 1} - ${Math.min((page + 1) * limit, query.data?.total ?? 0)} of ${query.data?.total ?? 0} cases` : ''}
-          </div>
-          <div className="eyebrow text-info" style={{ display: 'flex', gap: 16 }}>
-            <span>VALUE IN VIEW: {inr(query.data?.items.reduce((s:number,c:any)=>s+c.amount_at_risk, 0) || 0)}</span>
-          </div>
+        <h2 className="drawer-amount financial">{formatINR(c.amount)}</h2>
+        <span className="note">One failed debit</span>
+        <h3 className="drawer-failure">{c.failureReason}</h3>
+        <div className="drawer-plan">
+          {c.rail} <i />
+          {c.subscription}
         </div>
-
-        <QueryState q={query}>
-          {(d) => {
-            if (cases.length === 0) {
-              return (
-                <div className="state-empty" style={{ paddingTop: 80, paddingBottom: 80, background: 'var(--bg-1)', border: '1px solid var(--line)', borderRadius: 'var(--radius)' }}>
-                  {hasFilters ? "No recovery cases match these specific filters." : "No failed payments in the system."}
-                </div>
-              );
-            }
-            return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {cases.map((c: any) => (
-                  <div key={c.case_id} onClick={() => nav(`/cases/${c.case_id}`)} 
-                       style={{ cursor: 'pointer', display: 'grid', gridTemplateColumns: '200px 1fr max-content', gap: 32, padding: '24px', border: '1px solid var(--line)', borderRadius: 'var(--radius)', background: 'var(--bg-1)', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }} 
-                       className="hover-bg-0 case-row">
-                    
-                    {/* State Edge Highlight */}
-                    <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: c.state === 'RECOVERED' ? 'var(--good)' : (c.state === 'ESCALATED' ? 'var(--warn)' : (c.state === 'STOPPED' ? 'var(--bad)' : 'var(--info)')), opacity: 0.6 }} />
-
-                    <div style={{ paddingLeft: 12 }}>
-                      <div className="eyebrow" style={{ color: 'var(--ink-3)', marginBottom: 8, display: 'block' }}>Money at risk</div>
-                      <div className="num-display" style={{ fontSize: 24 }}>{inr(c.amount_at_risk)}</div>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 16 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <BudgetBlocks used={c.retries_used} max={3} />
-                          <span className="text-ink3" style={{ fontSize: 13, fontWeight: 500 }}>retries {c.retries_used}/3</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <BudgetBlocks used={c.contacts_sent} max={2} />
-                          <span className="text-ink3" style={{ fontSize: 13, fontWeight: 500 }}>contacts {c.contacts_sent}/2</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--ink-1)', fontSize: 16, marginBottom: 8 }}>{classHuman(c.failure_class)}</div>
-                        <div className="text-ink3" style={{ fontSize: 13, display: 'flex', gap: 12, alignItems: 'center' }}>
-                          <span className="chip" style={{ padding: '4px 8px', fontSize: 11 }}>{railHuman(c.rail)}</span>
-                          <span style={{ fontWeight: 500 }}>{c.bank || "Bank API"}</span>
-                          <span>&middot;</span>
-                          <span style={{ color: 'var(--ink-1)', fontWeight: 500 }}>{c.customer?.name || "Customer Account"}</span>
-                          <span>&middot;</span>
-                          <span className="mono">{c.case_id.split("-")[0]}</span>
-                        </div>
-                      </div>
-                      
-                      <div style={{ marginTop: 24, display: 'flex', gap: 12, alignItems: 'center' }}>
-                        <StateChip state={c.state} />
-                        <span className="text-ink3" style={{ fontSize: 13 }}>{c.state === 'RECOVERED' ? 'Successfully closed' : (c.state === 'STOPPED' ? 'Abandoned' : (c.state === 'ESCALATED' ? 'Transferred to human operator' : 'In automated recovery flow'))}</span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                      <div className="text-ink3" style={{ fontSize: 13, fontWeight: 500 }}>
-                        failed {ago(c.opened_ts)}
-                      </div>
-                      <div className="text-info" style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        View details <span style={{ fontSize: 16 }}>→</span>
-                      </div>
-                    </div>
-
-                  </div>
-                ))}
-              </div>
-            );
-          }}
-        </QueryState>
-
-        <div style={{ padding: '24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-          <button className="btn" disabled={page === 0} onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>← Newer</button>
-          <span className="eyebrow" style={{ color: 'var(--ink-3)' }}>
-            Page {page + 1}
+        <div className="drawer-budgets">
+          <Budget
+            label="Retries remaining"
+            used={c.constraints.retriesUsed}
+            max={3}
+          />
+          <Budget
+            label="Contacts remaining"
+            used={c.constraints.contactsUsed}
+            max={2}
+          />
+        </div>
+        <div className="drawer-selected">
+          <span>
+            <Check size={13} />
+            REVIO's call
           </span>
-          <button className="btn" disabled={(query.data?.items.length ?? 0) < limit || (page + 1) * limit >= (query.data?.total ?? 0)}
-            onClick={() => { setPage((p) => p + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Older →</button>
+          <strong>{c.strategy}</strong>
+          <div>
+            <span>
+              {chosen.probability === undefined
+                ? "Unscored control"
+                : `${Math.round(chosen.probability * 100)}% illustrative estimate`}
+            </span>
+            <strong className="financial">
+              {chosen.expectedValue === undefined
+                ? "N/A"
+                : formatINR(chosen.expectedValue, 2)}
+              <small>expected value</small>
+            </strong>
+          </div>
         </div>
+        <p className="drawer-outcome">{c.outcomeNote}</p>
+        <dl className="context-fields">
+          <div>
+            <dt>Original failure</dt>
+            <dd>{formatTime(c.createdAt)}</dd>
+          </div>
+          <div>
+            <dt>Latest recorded state</dt>
+            <dd>{formatTime(c.updatedAt)}</dd>
+          </div>
+          <div>
+            <dt>Permission snapshot</dt>
+            <dd>
+              {c.candidates.filter((a) => a.eligible).length} permitted /{" "}
+              {c.candidates.filter((a) => !a.eligible).length} blocked
+            </dd>
+          </div>
+          {c.nextActionAt && (
+            <div>
+              <dt>Next evaluation</dt>
+              <dd>{formatTime(c.nextActionAt)}</dd>
+            </div>
+          )}
+        </dl>
       </div>
-    </div>
+      <footer className="drawer-footer">
+        <button className="btn primary" onClick={() => open(`case/${c.id}`)}>
+          See the full working <ArrowRight size={14} />
+        </button>
+        <button className="btn" onClick={() => open(`lab/${c.id}`)}>
+          Replay in Decision Studio <ArrowUpRight size={14} />
+        </button>
+        <span>Read-only synthetic evidence. No live payments.</span>
+      </footer>
+    </Modal>
   );
 }
