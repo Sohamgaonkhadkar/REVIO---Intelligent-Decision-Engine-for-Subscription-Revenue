@@ -1,6 +1,6 @@
 # README Source Audit
 
-Every factual claim in `README.md` is traced to a specific source in the repository. This document maps sections to their authoritative references, enabling independent verification.
+This audit maps the numbered sections of the preserved [technical overview](docs/TECHNICAL_OVERVIEW.md) to their original repository sources. The [project README](README.md) now serves as the visual project entry point; its current stack and integration status are grounded in the merged frontend package, backend configuration and integration report. Historical test totals below are not a fresh verification of the deployed application.
 
 ---
 
