@@ -1,5 +1,9 @@
 # REVIO — Intelligent Revenue Recovery
 
+**Live website:** [revio-luminous.vercel.app](https://revio-luminous.vercel.app/)
+
+**Project description:** A compliance-first, ML-powered revenue recovery system for failed UPI AutoPay and card subscription payments. REVIO combines policy-based safeguards, XGBoost recovery scoring, expected-value action selection, and audit-ready decision logs. The demo uses synthetic data in a simulated environment.
+
 REVIO is a bounded, compliance-first revenue-recovery system for failed recurring payments on Indian subscription rails (UPI AutoPay and card standing instructions). When a scheduled auto-debit fails, REVIO opens a recovery case, classifies the failure, evaluates candidate actions through a constrained decision pipeline — deterministic rules, then ML probability, then expected-value economics — executes the optimal permitted action, and journals every step as append-only evidence.
 
 Everything in this repository runs against a simulated world (`env=sim`) with synthetic customers. The propensity model was trained on simulated recovery outcomes. No number produced by this system is evidence of real-world recovery performance. Every screen carries a persistent `SIM` badge; every API payload carries `env=sim`.
